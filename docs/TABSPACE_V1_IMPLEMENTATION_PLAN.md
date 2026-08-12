@@ -1,0 +1,248 @@
+# TabSpace v1 Implementation Plan
+
+## Objective
+
+Build and release the TabSpace Chrome extension from the published Figma design:
+
+- Design source: <https://duty-rule-28147876.figma.site/>
+- Chrome Manifest V3 extension
+- User-created spaces and groups
+- Real Chrome tab management
+- Provider-selected JSON import for Toby, Tabme, and TabSpace
+- TabSpace backup plus compatible exports
+- Private GitHub Gist synchronization as shown in the design
+- A modern project website deployed to GitHub Pages by GitHub Actions
+
+## Delivery rules
+
+Every work item follows the same completion gate:
+
+1. Implement only the entities and abstractions required by the item.
+2. Review the changed code for correctness, clarity, efficiency, duplication, and reusable module boundaries.
+3. Refine issues found by the review.
+4. Run the relevant lint, type-check, unit, component, end-to-end, and build validations.
+5. Record validation evidence and update this plan.
+6. Commit the completed item with a focused commit.
+7. Push the commit to the remote repository.
+
+A work item is not complete until all seven steps pass. Material design differences must be resolved against the published Figma site before release.
+
+## Status legend
+
+- `[ ]` Not started
+- `[>]` In progress
+- `[x]` Completed
+- `[!]` Blocked
+
+## Work items
+
+### WI-01 — Confirm v1 behavior and Chrome target
+
+- [x] Target Chrome with Manifest V3.
+- [x] Use a full extension management page matching the desktop Figma layout.
+- [x] Define assignment of newly discovered Chrome tabs to spaces.
+- [x] Define safe deletion behavior for spaces containing tabs.
+- [x] Include the Figma GitHub Gist synchronization experience in v1.
+- [x] Treat Work, Research, and Personal as examples only; spaces are user-created.
+- [x] Record architecture and product decisions.
+
+#### Decisions
+
+- The extension opens a full dashboard page; the toolbar action opens or focuses that page.
+- First installation creates one user-renamable `My Space`; the Figma Work, Research, and Personal spaces are never seeded as fixed product data.
+- A newly discovered Chrome tab is assigned to the most recently active TabSpace space and remains ungrouped until the user organizes it.
+- Deleting a space requires confirmation. Its open tabs remain open and are moved, ungrouped, to the first remaining space. The final space cannot be deleted.
+- TabSpace pinning uses Chrome's real pinned-tab state for open tabs.
+- GitHub synchronization uses a private Gist containing the canonical, versioned TabSpace backup document.
+- Domain operations remain pure functions over minimal data types. Chrome, storage, file, and GitHub APIs sit behind small adapters; React components consume those operations rather than duplicating business rules.
+- New classes, entities, and generalized abstractions are introduced only when at least one current behavior requires them.
+
+### WI-02 — Create the extension project
+
+- [ ] Configure React, TypeScript, Vite, and a package manager.
+- [ ] Configure Tailwind CSS or equivalent design styling.
+- [ ] Add Lucide icons, Inter, and JetBrains Mono.
+- [ ] Add development, lint, type-check, test, and production-build commands.
+- [ ] Produce a loadable unpacked-extension directory.
+
+### WI-03 — Configure Manifest V3 and extension runtime
+
+- [ ] Add extension metadata and icons.
+- [ ] Add the dashboard extension page.
+- [ ] Make the toolbar action open or focus the dashboard.
+- [ ] Add only required Chrome permissions and GitHub host permissions.
+- [ ] Implement the background service worker.
+- [ ] Handle installation and extension upgrades safely.
+
+### WI-04 — Define the persistent data model
+
+- [ ] Add a versioned root document for spaces, groups, tab metadata, settings, and sync metadata.
+- [ ] Define minimal Space, Group, TabRecord, Settings, and SyncMetadata types.
+- [ ] Add runtime validation and schema migration.
+- [ ] Add a `chrome.storage.local` repository with testable boundaries.
+- [ ] Exclude secrets from persisted backups and logs.
+
+### WI-05 — Integrate real Chrome tabs
+
+- [ ] Query current tabs and reconcile them with stored organization.
+- [ ] Listen for tab creation, update, activation, replacement, movement, and removal.
+- [ ] Activate/focus, close, and pin/unpin tabs with Chrome APIs.
+- [ ] Handle restricted URLs, stale IDs, restored tabs, and API failures.
+- [ ] Avoid duplicate records and unnecessary storage writes.
+
+### WI-06 — Reproduce the Figma application shell
+
+- [ ] Implement the dark full-height dashboard.
+- [ ] Implement the fixed sidebar, space navigation, toolbar, content area, and status bar.
+- [ ] Match Figma spacing, borders, typography, colors, icon sizing, and interaction states.
+- [ ] Keep the desktop layout usable at narrower extension-page widths.
+
+### WI-07 — Implement the Figma sidebar
+
+- [ ] Add the TabSpace branding and v1 label.
+- [ ] Add Open and Pinned views with counts.
+- [ ] List active-space tabs with avatar, title, active state, and pin state.
+- [ ] Activate browser tabs from the sidebar.
+- [ ] Show tabs, groups, pinned, and global totals.
+- [ ] Add the designed empty state.
+
+### WI-08 — Implement user-created spaces
+
+- [ ] Create unlimited spaces with name and emoji.
+- [ ] Switch, rename, recolor/re-emoji, order, and delete spaces.
+- [ ] Prevent unsafe deletion of the final space.
+- [ ] Apply the documented tab-relocation behavior during deletion.
+- [ ] Persist space order and the active space.
+- [ ] Show per-space tab and group counts.
+
+### WI-09 — Implement groups
+
+- [ ] Reproduce the New Group modal with name and Figma color palette.
+- [ ] Create, rename, collapse, expand, order, and delete groups.
+- [ ] Move tabs from deleted groups to Ungrouped.
+- [ ] Persist group state and show group tab counts.
+- [ ] Add the designed empty-group state.
+
+### WI-10 — Implement tab cards and actions
+
+- [ ] Reproduce the responsive Figma card grid.
+- [ ] Show alias/title, avatar/favicon, domain, active/pinned badges, and last-accessed time.
+- [ ] Support selection and Ctrl/Cmd/Shift multi-selection.
+- [ ] Rename aliases and choose custom emoji avatars.
+- [ ] Pin/unpin, move/remove group, copy URL, open/activate, and close tabs.
+- [ ] Render Ungrouped tabs separately.
+
+### WI-11 — Implement search and bulk actions
+
+- [ ] Search active-space aliases, titles, domains, and URLs as the user types.
+- [ ] Clear search and hide empty filtered groups.
+- [ ] Show the designed no-results state.
+- [ ] Show selected count, bulk destination selector, move action, and clear action.
+- [ ] Show selection state in the status bar.
+
+### WI-12 — Implement persistent organization and reconciliation
+
+- [ ] Persist spaces, groups, aliases, avatars, assignments, and settings.
+- [ ] Restore the last active space.
+- [ ] Reconcile stored records with open Chrome tabs without duplicates.
+- [ ] Debounce writes and recover from invalid/outdated storage.
+- [ ] Start from a safe default state without fixed Figma sample data.
+
+### WI-13 — Implement provider-selected JSON import
+
+- [ ] Require users to select Toby, Tabme, or TabSpace; do not auto-detect the provider.
+- [ ] Accept JSON through selection and drag/drop.
+- [ ] Implement separate Toby, Tabme, and TabSpace parsers and validators.
+- [ ] Obtain sanitized fixtures or authoritative schemas for Toby and Tabme exports.
+- [ ] Normalize provider data into the canonical model with generated safe IDs.
+- [ ] Preview spaces, groups, tabs, warnings, and skipped records.
+- [ ] Support Merge and confirmed Replace operations atomically.
+- [ ] Report useful provider mismatch, validation, and completion results.
+
+### WI-14 — Implement TabSpace JSON backup/export
+
+- [ ] Define the canonical versioned backup schema and export timestamp.
+- [ ] Include spaces, groups, safe tab metadata, aliases, and avatars.
+- [ ] Exclude credentials and sync secrets.
+- [ ] Validate and download `tabspace-backup.json`.
+- [ ] Support reliable TabSpace export/import round trips.
+
+### WI-15 — Implement compatible Figma export formats
+
+- [ ] Export Netscape Bookmarks HTML.
+- [ ] Export OneTab-compatible text.
+- [ ] Export human-readable Markdown.
+- [ ] Preserve space/group hierarchy where formats allow.
+- [ ] Show designed format descriptions, extensions, and data counts.
+
+### WI-16 — Implement GitHub Gist synchronization
+
+- [ ] Reproduce the Figma Gist synchronization section without simulated behavior.
+- [ ] Implement secure GitHub authentication without embedded secrets.
+- [ ] Create and update a private Gist containing canonical TabSpace JSON.
+- [ ] Persist only non-secret Gist metadata.
+- [ ] Add pull/restore and conflict-safe update behavior.
+- [ ] Show authentication, syncing, success, failure, rate-limit, and revoked-access states.
+- [ ] Warn that tab titles and URLs can contain sensitive information.
+
+### WI-17 — Implement dialogs and feedback
+
+- [ ] Match the New Group and Import/Export dialogs.
+- [ ] Add keyboard submission, safe Escape/outside dismissal, and focus management.
+- [ ] Add destructive confirmations.
+- [ ] Add disabled, loading, success, and actionable error states.
+- [ ] Preserve entered data after recoverable errors.
+
+### WI-18 — Accessibility and interaction quality
+
+- [ ] Label icon-only controls and use semantic structure.
+- [ ] Make core workflows keyboard accessible with visible focus.
+- [ ] Trap/restore dialog focus and announce async status changes.
+- [ ] Meet contrast expectations and avoid color-only meaning.
+- [ ] Respect reduced-motion preferences.
+
+### WI-19 — Complete automated testing
+
+- [ ] Unit-test models, migrations, organization operations, reconciliation, search, and bulk moves.
+- [ ] Test Toby, Tabme, and TabSpace parsers with provider mismatch and malformed data cases.
+- [ ] Test Merge, Replace, backup round trips, and compatible exports.
+- [ ] Mock and test Chrome and GitHub boundaries.
+- [ ] Add component tests for cards, spaces, groups, and dialogs.
+- [ ] Add extension end-to-end tests for critical workflows.
+- [ ] Pass lint, type-check, tests, and production build.
+
+### WI-20 — Verify implementation against Figma
+
+- [ ] Compare the dashboard shell, sidebar, spaces, toolbar, groups, cards, and status bar.
+- [ ] Compare New Group and Import/Export dialogs.
+- [ ] Compare empty, search, selection, loading, error, and success states.
+- [ ] Capture desktop-viewport screenshots and resolve material visual differences.
+- [ ] Verify all Figma interactions against real extension behavior.
+
+### WI-21 — Documentation and extension release readiness
+
+- [ ] Document setup, development, validation, build, and unpacked installation.
+- [ ] Document permissions, spaces, groups, search, actions, import, export, backup, and restore.
+- [ ] Document Toby/Tabme fixture expectations and provider selection.
+- [ ] Document GitHub sync privacy/security and known limitations.
+- [ ] Add release icons and metadata.
+- [ ] Pass clean-install and packaged-extension smoke tests.
+
+### WI-22 — Build and deploy the GitHub Pages website
+
+- [ ] Create a modern responsive project website consistent with the TabSpace visual identity.
+- [ ] Include hero, feature overview, workflow, design screenshots, privacy/security, installation, and repository links.
+- [ ] Add accessible navigation, responsive layouts, metadata, social preview, and favicon.
+- [ ] Build the static website with the repository toolchain.
+- [ ] Add a GitHub Actions workflow that validates and deploys the site to GitHub Pages.
+- [ ] Document Pages repository settings and deployment behavior.
+- [ ] Verify the production build and deployed URL.
+
+## Completion checklist
+
+- [ ] Every WI-01 through WI-22 is completed, reviewed, validated, committed, and pushed.
+- [ ] The extension can be installed as an unpacked Chrome extension from a clean build.
+- [ ] The extension follows the published Figma design.
+- [ ] Toby, Tabme, and TabSpace imports work through explicit provider selection.
+- [ ] No credentials or private tab data are committed to the repository.
+- [ ] GitHub Pages is built and deployed through GitHub Actions.
