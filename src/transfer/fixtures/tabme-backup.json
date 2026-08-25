@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "spaces": [
+    {
+      "name": "Research",
+      "folders": [
+        {
+          "name": "Sources",
+          "bookmarks": [
+            {
+              "title": "Example",
+              "url": "https://example.com/"
+            }
+          ]
+        }
+      ],
+      "bookmarks": []
+    }
+  ]
+}

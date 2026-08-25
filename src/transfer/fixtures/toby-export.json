@@ -1,0 +1,21 @@
+{
+  "version": 3,
+  "groups": [
+    {
+      "name": "Work",
+      "type": "default",
+      "lists": [
+        {
+          "title": "Documentation",
+          "cards": [
+            {
+              "title": "TypeScript",
+              "customTitle": "TypeScript Handbook",
+              "url": "https://www.typescriptlang.org/docs/"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

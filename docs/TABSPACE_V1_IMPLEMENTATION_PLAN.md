@@ -208,30 +208,42 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-13 — Implement provider-selected JSON import
 
-- [ ] Require users to select Toby, Tabme, or TabSpace; do not auto-detect the provider.
-- [ ] Accept JSON through selection and drag/drop.
-- [ ] Implement separate Toby, Tabme, and TabSpace parsers and validators.
-- [ ] Obtain sanitized fixtures or authoritative schemas for Toby and Tabme exports.
-- [ ] Normalize provider data into the canonical model with generated safe IDs.
-- [ ] Preview spaces, groups, tabs, warnings, and skipped records.
-- [ ] Support Merge and confirmed Replace operations atomically.
-- [ ] Report useful provider mismatch, validation, and completion results.
+- [x] Require users to select Toby, Tabme, or TabSpace; do not auto-detect the provider.
+- [x] Accept JSON through selection and drag/drop.
+- [x] Implement separate Toby, Tabme, and TabSpace parsers and validators.
+- [x] Obtain sanitized fixtures or authoritative schemas for Toby and Tabme exports.
+- [x] Normalize provider data into the canonical model with generated safe IDs.
+- [x] Preview spaces, groups, tabs, warnings, and skipped records.
+- [x] Support Merge and confirmed Replace operations atomically.
+- [x] Report useful provider mismatch, validation, and completion results.
+
+#### Validation
+
+- Sanitized Toby organization and Tabme backup profile fixtures are stored with the parser tests. Import tests cover both providers, explicit mismatch errors, unsafe URL skipping, and atomic Merge and Replace.
 
 ### WI-14 — Implement TabSpace JSON backup/export
 
-- [ ] Define the canonical versioned backup schema and export timestamp.
-- [ ] Include spaces, groups, safe tab metadata, aliases, and avatars.
-- [ ] Exclude credentials and sync secrets.
-- [ ] Validate and download `tabspace-backup.json`.
-- [ ] Support reliable TabSpace export/import round trips.
+- [x] Define the canonical versioned backup schema and export timestamp.
+- [x] Include spaces, groups, safe tab metadata, aliases, and avatars.
+- [x] Exclude credentials and sync secrets.
+- [x] Validate and download `tabspace-backup.json`.
+- [x] Support reliable TabSpace export/import round trips.
+
+#### Validation
+
+- Canonical backup tests validate export/import round trips and verify that Chrome runtime IDs and synchronization data are absent.
 
 ### WI-15 — Implement compatible Figma export formats
 
-- [ ] Export Netscape Bookmarks HTML.
-- [ ] Export OneTab-compatible text.
-- [ ] Export human-readable Markdown.
-- [ ] Preserve space/group hierarchy where formats allow.
-- [ ] Show designed format descriptions, extensions, and data counts.
+- [x] Export Netscape Bookmarks HTML.
+- [x] Export OneTab-compatible text.
+- [x] Export human-readable Markdown.
+- [x] Preserve space/group hierarchy where formats allow.
+- [x] Show designed format descriptions, extensions, and data counts.
+
+#### Validation
+
+- Export tests verify identifying HTML, OneTab, and Markdown output while the dialog displays format descriptions, extensions, and current tab counts.
 
 ### WI-16 — Implement GitHub Gist synchronization
 
