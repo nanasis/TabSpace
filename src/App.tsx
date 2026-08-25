@@ -1,9 +1,10 @@
-import { Layers3, PanelLeft, Search, Settings2 } from 'lucide-react'
+import { PanelLeft, Search, Settings2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { useTabSpaceDocument } from './app/useTabSpaceDocument'
 import { Sidebar } from './components/Sidebar'
 import { SpaceBar } from './components/SpaceBar'
+import { Workspace } from './components/Workspace'
 import {
   createChromeDocumentRepository,
   type DocumentRepository,
@@ -73,32 +74,21 @@ export function App({ repository }: AppProps) {
 
         <main className="flex-1 p-4 sm:p-7" aria-labelledby="workspace-title">
           <div className="mx-auto max-w-7xl">
-            <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-violet-400">
-              Active workspace
-            </p>
-            <h2 id="workspace-title" className="mt-2 text-2xl font-semibold tracking-tight">
-              {activeSpace?.name ?? 'Your tabs'}
-            </h2>
-
             {error || actionError ? (
-              <div className="mt-6 rounded-xl border border-red-400/20 bg-red-400/8 px-4 py-3 text-sm text-red-200" role="alert">
+              <div className="mb-6 rounded-xl border border-red-400/20 bg-red-400/8 px-4 py-3 text-sm text-red-200" role="alert">
                 {error ?? actionError}
               </div>
             ) : null}
 
-            <section className="mt-7 min-h-80 rounded-2xl border border-dashed border-white/10 bg-white/[0.015] p-8">
-              <div className="grid h-full min-h-64 place-items-center text-center">
-                <div>
-                  <Layers3 className="mx-auto size-9 text-zinc-700" aria-hidden="true" />
-                  <p className="mt-4 text-sm font-medium text-zinc-300">
-                    {loading ? 'Preparing your workspace…' : 'Your tab workspace is ready'}
-                  </p>
-                  <p className="mt-1 text-xs leading-5 text-zinc-600">
-                    Tab groups and cards will appear in this area.
-                  </p>
-                </div>
-              </div>
-            </section>
+            {document ? (
+              <Workspace
+                document={document}
+                updateDocument={updateDocument}
+                onError={setActionError}
+              />
+            ) : (
+              <p className="py-20 text-center text-sm text-zinc-600">Preparing your workspace…</p>
+            )}
           </div>
         </main>
 

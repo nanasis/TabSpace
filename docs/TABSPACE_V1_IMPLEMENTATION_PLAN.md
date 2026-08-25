@@ -155,11 +155,16 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-09 — Implement groups
 
-- [ ] Reproduce the New Group modal with name and Figma color palette.
-- [ ] Create, rename, collapse, expand, order, and delete groups.
-- [ ] Move tabs from deleted groups to Ungrouped.
-- [ ] Persist group state and show group tab counts.
-- [ ] Add the designed empty-group state.
+- [x] Reproduce the New Group modal with name and Figma color palette.
+- [x] Create, rename, collapse, expand, order, and delete groups.
+- [x] Move tabs from deleted groups to Ungrouped.
+- [x] Persist group state and show group tab counts.
+- [x] Add the designed empty-group state.
+
+#### Validation
+
+- `npm run validate` passed on 2026-08-25 with 29 tests and the production extension build.
+- Group operation tests cover create/edit/collapse/order behavior and deletion that safely moves tabs to Ungrouped and compacts group order.
 
 ### WI-10 — Implement tab cards and actions
 
