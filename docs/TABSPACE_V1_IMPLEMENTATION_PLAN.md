@@ -288,13 +288,18 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-19 — Complete automated testing
 
-- [ ] Unit-test models, migrations, organization operations, reconciliation, search, and bulk moves.
-- [ ] Test Toby, Tabme, and TabSpace parsers with provider mismatch and malformed data cases.
-- [ ] Test Merge, Replace, backup round trips, and compatible exports.
-- [ ] Mock and test Chrome and GitHub boundaries.
-- [ ] Add component tests for cards, spaces, groups, and dialogs.
-- [ ] Add extension end-to-end tests for critical workflows.
-- [ ] Pass lint, type-check, tests, and production build.
+- [x] Unit-test models, migrations, organization operations, reconciliation, search, and bulk moves.
+- [x] Test Toby, Tabme, and TabSpace parsers with provider mismatch and malformed data cases.
+- [x] Test Merge, Replace, backup round trips, and compatible exports.
+- [x] Mock and test Chrome and GitHub boundaries.
+- [x] Add component tests for cards, spaces, groups, and dialogs.
+- [x] Add extension end-to-end tests for critical workflows.
+- [x] Pass lint, type-check, tests, and production build.
+
+#### Validation
+
+- `npm run validate` passes ESLint, TypeScript, 56 Vitest tests across 13 files, the production extension build/reference check, and a Playwright end-to-end dashboard workflow in Microsoft Edge.
+- The end-to-end workflow loads the production bundle with a browser API boundary, changes persistent settings, opens Import/Export, uploads a canonical backup, and verifies its preview.
 
 ### WI-20 — Verify implementation against Figma
 
