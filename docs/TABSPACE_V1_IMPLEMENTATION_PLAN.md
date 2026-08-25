@@ -115,10 +115,15 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-06 — Reproduce the Figma application shell
 
-- [ ] Implement the dark full-height dashboard.
-- [ ] Implement the fixed sidebar, space navigation, toolbar, content area, and status bar.
-- [ ] Match Figma spacing, borders, typography, colors, icon sizing, and interaction states.
-- [ ] Keep the desktop layout usable at narrower extension-page widths.
+- [x] Implement the dark full-height dashboard.
+- [x] Implement the fixed sidebar, space navigation, toolbar, content area, and status bar.
+- [x] Match Figma spacing, borders, typography, colors, icon sizing, and interaction states.
+- [x] Keep the desktop layout usable at narrower extension-page widths.
+
+#### Validation
+
+- `npm run validate` passed on 2026-08-25 with the responsive application shell and live local-document loading.
+- The component smoke test verifies the branded shell and asynchronously loaded active-space heading.
 
 ### WI-07 — Implement the Figma sidebar
 
