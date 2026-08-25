@@ -87,11 +87,17 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-04 — Define the persistent data model
 
-- [ ] Add a versioned root document for spaces, groups, tab metadata, settings, and sync metadata.
-- [ ] Define minimal Space, Group, TabRecord, Settings, and SyncMetadata types.
-- [ ] Add runtime validation and schema migration.
-- [ ] Add a `chrome.storage.local` repository with testable boundaries.
-- [ ] Exclude secrets from persisted backups and logs.
+- [x] Add a versioned root document for spaces, groups, tab metadata, settings, and sync metadata.
+- [x] Define minimal Space, Group, TabRecord, Settings, and SyncMetadata types.
+- [x] Add runtime validation and schema migration.
+- [x] Add a `chrome.storage.local` repository with testable boundaries.
+- [x] Exclude secrets from persisted backups and logs.
+
+#### Validation
+
+- `npm run validate` passed on 2026-08-25: ESLint, TypeScript, 16 Vitest tests, the production build, and unpacked-extension verification.
+- Model tests cover first-install state, entity integrity, duplicate IDs, strict credential rejection, v0-to-v1 migration, and unsupported future versions.
+- Repository tests cover initial persistence, no-op current loads, migration persistence, corrupt-storage preservation, and validation before writes.
 
 ### WI-05 — Integrate real Chrome tabs
 

@@ -1,4 +1,5 @@
 import { openOrFocusDashboard, type DashboardBrowser } from './background/dashboard'
+import { createChromeDocumentRepository } from './storage/documentRepository'
 
 const browser: DashboardBrowser = {
   getDashboardUrl: () => chrome.runtime.getURL('index.html'),
@@ -14,6 +15,7 @@ const browser: DashboardBrowser = {
   },
 }
 
+const documentRepository = createChromeDocumentRepository()
 let dashboardTask: Promise<void> | undefined
 
 function reportRuntimeError(error: unknown) {
@@ -40,7 +42,15 @@ chrome.action.onClicked.addListener(() => {
 })
 
 chrome.runtime.onInstalled.addListener(({ reason }) => {
-  if (reason === 'install') {
-    void scheduleDashboard()
-  }
+  void documentRepository
+    .load()
+    .catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : 'Unknown storage error'
+      console.error(`TabSpace could not initialize local storage: ${message}`)
+    })
+    .finally(() => {
+      if (reason === 'install') {
+        void scheduleDashboard()
+      }
+    })
 })
