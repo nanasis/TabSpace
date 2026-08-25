@@ -275,11 +275,16 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-18 — Accessibility and interaction quality
 
-- [ ] Label icon-only controls and use semantic structure.
-- [ ] Make core workflows keyboard accessible with visible focus.
-- [ ] Trap/restore dialog focus and announce async status changes.
-- [ ] Meet contrast expectations and avoid color-only meaning.
-- [ ] Respect reduced-motion preferences.
+- [x] Label icon-only controls and use semantic structure.
+- [x] Make core workflows keyboard accessible with visible focus.
+- [x] Trap/restore dialog focus and announce async status changes.
+- [x] Meet contrast expectations and avoid color-only meaning.
+- [x] Respect reduced-motion preferences.
+
+#### Validation
+
+- Interactive controls have accessible names and a global high-contrast `:focus-visible` treatment; status and error regions announce changes.
+- Dialogs trap and restore focus, group colors are paired with text, and reduced-motion preferences disable non-essential transitions and animation.
 
 ### WI-19 — Complete automated testing
 

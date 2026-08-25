@@ -90,7 +90,7 @@ export function App({ repository }: AppProps) {
           </div>
         </main>
 
-        <footer className="flex h-9 items-center justify-between border-t border-white/8 px-4 font-mono text-[10px] text-zinc-600 sm:px-7">
+        <footer className="flex h-9 items-center justify-between border-t border-white/8 px-4 font-mono text-[10px] text-zinc-600 sm:px-7" aria-live="polite">
           <span>
             {selection.spaceId === document?.settings.activeSpaceId && selection.count
               ? `${selection.count} tabs selected`
