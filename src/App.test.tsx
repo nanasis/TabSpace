@@ -41,5 +41,9 @@ describe('App', () => {
         expect.objectContaining({ settings: expect.objectContaining({ cardDensity: 'compact' }) }),
       ),
     )
+
+    await user.keyboard('{Escape}')
+    expect(screen.queryByRole('dialog', { name: 'Settings' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Settings' })).toHaveFocus()
   })
 })

@@ -262,11 +262,16 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-17 — Implement dialogs and feedback
 
-- [ ] Match the New Group and Import/Export dialogs.
-- [ ] Add keyboard submission, safe Escape/outside dismissal, and focus management.
-- [ ] Add destructive confirmations.
-- [ ] Add disabled, loading, success, and actionable error states.
-- [ ] Preserve entered data after recoverable errors.
+- [x] Match the New Group and Import/Export dialogs.
+- [x] Add keyboard submission, safe Escape/outside dismissal, and focus management.
+- [x] Add destructive confirmations.
+- [x] Add disabled, loading, success, and actionable error states.
+- [x] Preserve entered data after recoverable errors.
+
+#### Validation
+
+- A shared dialog-focus boundary traps Tab navigation, supports Escape, and restores the prior trigger. Component coverage verifies Settings dismissal and trigger focus restoration.
+- Replace imports, Gist restores, space deletion, and group deletion require confirmation; asynchronous sync and import controls expose disabled, success, and actionable failure states.
 
 ### WI-18 — Accessibility and interaction quality
 

@@ -1,5 +1,5 @@
 import { Download, FileJson, Upload, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import type { TabSpaceDocument } from '../model/document'
 import { applyImport, type ImportMode } from '../transfer/applyImport'
@@ -7,6 +7,7 @@ import { createBookmarksHtml, createMarkdown, createOneTabText, downloadFile } f
 import { parseImport } from '../transfer/importers'
 import { createBackup } from '../transfer/tabSpaceBackup'
 import type { ImportPreview, ImportProvider } from '../transfer/types'
+import { useDialogFocus } from './useDialogFocus'
 
 export interface ImportExportDialogProps {
   document: TabSpaceDocument
@@ -20,12 +21,7 @@ export function ImportExportDialog({ document, updateDocument, onClose }: Import
   const [mode, setMode] = useState<ImportMode>('merge')
   const [error, setError] = useState<string>()
   const [status, setStatus] = useState<string>()
-
-  useEffect(() => {
-    const closeOnEscape = (event: KeyboardEvent) => event.key === 'Escape' && onClose()
-    window.addEventListener('keydown', closeOnEscape)
-    return () => window.removeEventListener('keydown', closeOnEscape)
-  }, [onClose])
+  const dialogRef = useDialogFocus<HTMLElement>(onClose)
 
   async function readFile(file: File | undefined) {
     if (!file) return
@@ -64,7 +60,7 @@ export function ImportExportDialog({ document, updateDocument, onClose }: Import
 
   return (
     <div className="fixed inset-0 z-[60] grid place-items-center overflow-y-auto bg-black/75 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
-      <section className="my-4 w-full max-w-3xl rounded-2xl border border-white/10 bg-[#17171e] shadow-2xl shadow-black/60" role="dialog" aria-modal="true" aria-labelledby="transfer-title">
+      <section ref={dialogRef} className="my-4 w-full max-w-3xl rounded-2xl border border-white/10 bg-[#17171e] shadow-2xl shadow-black/60" role="dialog" aria-modal="true" aria-labelledby="transfer-title">
         <header className="flex items-start border-b border-white/8 p-5">
           <div className="flex-1"><h2 id="transfer-title" className="text-lg font-semibold">Import & export</h2><p className="mt-1 text-xs text-zinc-500">Move spaces, groups, and tabs without exposing credentials.</p></div>
           <button className="icon-button" onClick={onClose} aria-label="Close import and export" type="button"><X className="size-4" /></button>

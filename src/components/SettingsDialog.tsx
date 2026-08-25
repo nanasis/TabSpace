@@ -1,8 +1,7 @@
 import { Database, GitBranch, Import, ShieldCheck, X } from 'lucide-react'
-import { useEffect } from 'react'
-
 import type { Settings, TabSpaceDocument } from '../model/document'
 import { GistSyncSection } from './GistSyncSection'
+import { useDialogFocus } from './useDialogFocus'
 
 export interface SettingsDialogProps {
   document: TabSpaceDocument
@@ -13,13 +12,7 @@ export interface SettingsDialogProps {
 }
 
 export function SettingsDialog({ document, onChange, onClose, onOpenDataTransfer, updateDocument }: SettingsDialogProps) {
-  useEffect(() => {
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', closeOnEscape)
-    return () => window.removeEventListener('keydown', closeOnEscape)
-  }, [onClose])
+  const dialogRef = useDialogFocus<HTMLElement>(onClose)
 
   return (
     <div
@@ -28,6 +21,7 @@ export function SettingsDialog({ document, onChange, onClose, onOpenDataTransfer
       onMouseDown={(event) => event.target === event.currentTarget && onClose()}
     >
       <section
+        ref={dialogRef}
         className="w-full max-w-lg rounded-2xl border border-white/10 bg-[#17171e] shadow-2xl shadow-black/60"
         role="dialog"
         aria-modal="true"

@@ -1,5 +1,7 @@
 import { useState } from 'react'
 
+import { useDialogFocus } from './useDialogFocus'
+
 const COLORS = ['#8b5cf6', '#3b82f6', '#14b8a6', '#22c55e', '#f59e0b', '#f97316', '#ef4444', '#ec4899']
 
 export interface NewGroupDialogProps {
@@ -10,10 +12,12 @@ export interface NewGroupDialogProps {
 export function NewGroupDialog({ onClose, onCreate }: NewGroupDialogProps) {
   const [name, setName] = useState('')
   const [color, setColor] = useState(COLORS[0] ?? '#8b5cf6')
+  const dialogRef = useDialogFocus<HTMLFormElement>(onClose)
 
   return (
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4 backdrop-blur-sm" role="presentation" onMouseDown={(event) => event.target === event.currentTarget && onClose()}>
       <form
+        ref={dialogRef}
         className="w-full max-w-md rounded-2xl border border-white/10 bg-[#17171e] p-5 shadow-2xl shadow-black/60"
         role="dialog"
         aria-modal="true"
