@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { faviconForImportedTab } from './favicon'
 import { backupSchema } from './tabSpaceBackup'
 import type { ImportedGroup, ImportedSpace, ImportedTab, ImportPreview, ImportProvider } from './types'
 
@@ -8,6 +9,8 @@ const tobyCardSchema = z.object({
   url: z.string(),
   title: z.string().optional(),
   customTitle: z.string().optional(),
+  favIconUrl: z.string().optional(),
+  faviconUrl: z.string().optional(),
 }).passthrough()
 const tobyListSchema = z.object({
   title: z.string().optional(),
@@ -15,11 +18,21 @@ const tobyListSchema = z.object({
   cards: z.array(tobyCardSchema).default([]),
 }).passthrough()
 
-function safeTab(url: string, title?: string, alias?: string): ImportedTab | undefined {
+function safeTab(
+  url: string,
+  title?: string,
+  alias?: string,
+  faviconUrl?: string,
+): ImportedTab | undefined {
   try {
     const parsed = new URL(url)
     if (!['http:', 'https:'].includes(parsed.protocol)) return undefined
-    return { url: parsed.href, title: title?.trim() || parsed.hostname, ...(alias?.trim() ? { alias: alias.trim() } : {}) }
+    return {
+      url: parsed.href,
+      title: title?.trim() || parsed.hostname,
+      ...(alias?.trim() ? { alias: alias.trim() } : {}),
+      faviconUrl: faviconForImportedTab(parsed, faviconUrl),
+    }
   } catch {
     return undefined
   }
@@ -68,7 +81,12 @@ function toImportedSpace(
       const parsed = tobyListSchema.safeParse(rawList)
       if (!parsed.success) return []
       const tabs = parsed.data.cards.flatMap((card) => {
-        const tab = safeTab(card.url, card.title, card.customTitle)
+        const tab = safeTab(
+          card.url,
+          card.title,
+          card.customTitle,
+          card.favIconUrl ?? card.faviconUrl,
+        )
         if (!tab) counter.skipped += 1
         return tab ? [tab] : []
       })
@@ -83,6 +101,8 @@ interface TabmeItem {
   url?: string
   title?: string
   name?: string
+  favIconUrl?: string
+  faviconUrl?: string
   groupItems?: TabmeItem[]
 }
 
@@ -91,6 +111,8 @@ const tabmeItemSchema: z.ZodType<TabmeItem> = z.lazy(() =>
     url: z.string().optional(),
     title: z.string().optional(),
     name: z.string().optional(),
+    favIconUrl: z.string().optional(),
+    faviconUrl: z.string().optional(),
     groupItems: z.array(tabmeItemSchema).optional(),
   }).passthrough(),
 )
@@ -117,7 +139,12 @@ function normalizeTabmeItems(rawItems: TabmeItem[], counter: { skipped: number }
     const nestedTabs = normalizeTabmeItems(rawItem.groupItems ?? [], counter)
     if (!rawItem.url) return nestedTabs
 
-    const tab = safeTab(rawItem.url, rawItem.title ?? rawItem.name)
+    const tab = safeTab(
+      rawItem.url,
+      rawItem.title ?? rawItem.name,
+      undefined,
+      rawItem.favIconUrl ?? rawItem.faviconUrl,
+    )
     if (!tab) counter.skipped += 1
     return tab ? [tab, ...nestedTabs] : nestedTabs
   })

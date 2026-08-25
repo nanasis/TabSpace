@@ -2,6 +2,7 @@ import { tabSpaceDocumentSchema, type TabRecord, type TabSpaceDocument } from '.
 
 export interface BrowserTabSnapshot {
   id: number
+  windowId: number
   url: string
   title: string
   faviconUrl?: string
@@ -43,6 +44,7 @@ function accessedAt(tab: BrowserTabSnapshot, fallback: string) {
 
 function tabChanged(record: TabRecord, tab: BrowserTabSnapshot, nextAccessedAt: string) {
   return (
+    record.windowId !== tab.windowId ||
     record.url !== tab.url ||
     record.title !== tab.title ||
     record.faviconUrl !== tab.faviconUrl ||
@@ -118,6 +120,7 @@ export function reconcileTabs(
       if (index >= 0) {
         nextRecords[index] = {
           ...existing,
+          windowId: tab.windowId,
           url: tab.url,
           title: tab.title,
           ...(tab.faviconUrl ? { faviconUrl: tab.faviconUrl } : { faviconUrl: undefined }),
@@ -134,6 +137,7 @@ export function reconcileTabs(
     nextRecords.push({
       id: createId(),
       chromeTabId: tab.id,
+      windowId: tab.windowId,
       spaceId: document.settings.activeSpaceId,
       url: tab.url,
       title: tab.title,

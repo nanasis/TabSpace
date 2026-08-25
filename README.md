@@ -58,7 +58,7 @@ After changing source code, rebuild and select **Reload** on the TabSpace extens
 
 ### Spaces and groups
 
-New tabs enter the most recently active space as Ungrouped. The sidebar lists only tabs that are currently open in Chrome. Drag an open sidebar tab onto a group, or onto **New group** to create a default group automatically. Tab cards can also be dragged between groups or back to Ungrouped. Use the space toolbar to create or switch spaces. Deleting a group moves its tabs to Ungrouped. Deleting a space keeps its Chrome tabs open and moves their records ungrouped to the first remaining space. The final space cannot be deleted.
+New tabs enter the most recently active space as Ungrouped. The sidebar lists every currently open tab in the dashboard's Chrome window, regardless of which TabSpace space or group owns it. Drag an open sidebar tab onto a group, or onto **New group** to create a default group automatically. Tab cards can also be dragged between groups or back to Ungrouped. Use the space toolbar to create or switch spaces. Deleting a group moves its tabs to Ungrouped. Deleting a space keeps its Chrome tabs open and moves their records ungrouped to the first remaining space. The final space cannot be deleted.
 
 ### Search and tab actions
 
@@ -72,7 +72,7 @@ Open **Settings → Import or export data**. Choose the provider before selectin
 - **Tabme:** backup profile using spaces, folders/collections, and `items`; direct links and nested `groupItems` are flattened into their containing TabSpace group. See the sanitized fixture at `src/transfer/fixtures/tabme-backup.json`
 - **TabSpace:** canonical `tabspace-backup.json`
 
-Review the preview and warnings, then choose **Merge** or confirmed **Replace**. Unsupported or unsafe non-HTTP(S) URLs are skipped and reported. The sanitized Toby fixture is at `src/transfer/fixtures/toby-export.json`.
+Review the preview and warnings, then choose **Merge** or confirmed **Replace**. After a successful import, the dialog closes and the imported workspace appears immediately. Imported favicon URLs are sanitized and retained, with a conventional site favicon fallback. Unsupported or unsafe non-HTTP(S) tab URLs are skipped and reported. The sanitized Toby fixture is at `src/transfer/fixtures/toby-export.json`.
 
 Exports preserve space/group hierarchy where the target format permits it. Backup and export files contain tab titles and URLs and should be treated as sensitive.
 

@@ -17,6 +17,7 @@ function createDocument() {
 function browserTab(overrides: Partial<BrowserTabSnapshot> = {}): BrowserTabSnapshot {
   return {
     id: 10,
+    windowId: 2,
     url: 'https://example.com/',
     title: 'Example',
     pinned: false,
@@ -40,6 +41,7 @@ describe('reconcileTabs', () => {
       expect.objectContaining({
         id: 'tab-1',
         chromeTabId: 10,
+        windowId: 2,
         spaceId: 'space-1',
         url: 'https://example.com/',
         order: 0,

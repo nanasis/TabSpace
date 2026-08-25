@@ -7,23 +7,24 @@ import { writeTabDragPayload } from '../tabs/tabDrag'
 
 export interface SidebarProps {
   document?: TabSpaceDocument
-  activeSpaceName?: string
+  currentWindowId?: number
   onActionError(message: string): void
 }
 
 type TabView = 'open' | 'pinned'
 
-export function Sidebar({ document, activeSpaceName, onActionError }: SidebarProps) {
+export function Sidebar({ document, currentWindowId, onActionError }: SidebarProps) {
   const [view, setView] = useState<TabView>('open')
-  const activeSpaceId = document?.settings.activeSpaceId
-  const spaceTabs = useMemo(
+  const openTabs = useMemo(
     () =>
       document?.tabs.filter(
-        ({ spaceId, chromeTabId }) => spaceId === activeSpaceId && chromeTabId !== undefined,
+        ({ chromeTabId, windowId }) =>
+          chromeTabId !== undefined &&
+          (currentWindowId === undefined || windowId === undefined || windowId === currentWindowId),
       ) ?? [],
-    [activeSpaceId, document?.tabs],
+    [currentWindowId, document?.tabs],
   )
-  const visibleTabs = view === 'pinned' ? spaceTabs.filter(({ pinned }) => pinned) : spaceTabs
+  const visibleTabs = view === 'pinned' ? openTabs.filter(({ pinned }) => pinned) : openTabs
 
   async function activate(tabId: number | undefined) {
     if (tabId === undefined) {
@@ -62,7 +63,7 @@ export function Sidebar({ document, activeSpaceName, onActionError }: SidebarPro
             onClick={() => setView('open')}
             type="button"
           >
-            <Rows3 className="size-3.5" /> Open <span className="text-zinc-500">{spaceTabs.length}</span>
+            <Rows3 className="size-3.5" /> Open <span className="text-zinc-500">{openTabs.length}</span>
           </button>
           <button
             className={`flex items-center justify-center gap-2 rounded-lg px-2 py-2 text-xs transition ${view === 'pinned' ? 'bg-white/8 text-white' : 'text-zinc-500 hover:text-zinc-300'}`}
@@ -70,7 +71,7 @@ export function Sidebar({ document, activeSpaceName, onActionError }: SidebarPro
             type="button"
           >
             <Pin className="size-3.5" /> Pinned{' '}
-            <span className="text-zinc-500">{spaceTabs.filter(({ pinned }) => pinned).length}</span>
+            <span className="text-zinc-500">{openTabs.filter(({ pinned }) => pinned).length}</span>
           </button>
         </div>
       </nav>
@@ -78,7 +79,7 @@ export function Sidebar({ document, activeSpaceName, onActionError }: SidebarPro
       <div className="min-h-0 flex-1 overflow-y-auto px-3 py-4">
         <div className="flex items-center justify-between px-2">
           <p className="truncate font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-600">
-            {activeSpaceName ?? 'Current space'}
+            Current window
           </p>
           <span className="font-mono text-[10px] text-zinc-700">{visibleTabs.length}</span>
         </div>
@@ -118,7 +119,7 @@ export function Sidebar({ document, activeSpaceName, onActionError }: SidebarPro
 
       <div className="border-t border-white/8 p-4 font-mono text-[10px] text-zinc-600">
         {document
-          ? `${spaceTabs.length} open tabs · ${document.groups.filter(({ spaceId }) => spaceId === activeSpaceId).length} groups · ${document.tabs.filter(({ chromeTabId }) => chromeTabId !== undefined).length} open total`
+          ? `${openTabs.length} open tabs · ${openTabs.filter(({ pinned }) => pinned).length} pinned · current window`
           : 'Loading local workspace…'}
       </div>
     </aside>

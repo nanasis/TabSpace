@@ -1,4 +1,5 @@
 import { tabSpaceDocumentSchema, type Group, type Space, type TabRecord, type TabSpaceDocument } from '../model/document'
+import { faviconForImportedTab } from './favicon'
 import type { ImportPreview } from './types'
 
 export type ImportMode = 'merge' | 'replace'
@@ -50,6 +51,7 @@ export function applyImport(
 
     const addTabs = (importedTabs: typeof importedSpace.ungroupedTabs, groupId?: string) => {
       importedTabs.forEach((tab, tabIndex) => {
+        const faviconUrl = faviconForImportedTab(tab.url, tab.faviconUrl)
         tabs.push({
           id: createId(),
           spaceId,
@@ -58,6 +60,7 @@ export function applyImport(
           title: tab.title.slice(0, 4096),
           ...(tab.alias ? { alias: tab.alias.slice(0, 512) } : {}),
           ...(tab.avatarEmoji ? { avatarEmoji: tab.avatarEmoji.slice(0, 16) } : {}),
+          ...(faviconUrl ? { faviconUrl } : {}),
           pinned: false,
           active: false,
           order: tabIndex,
@@ -106,6 +109,7 @@ export function applyImport(
             tabs[importedIndex] = {
               ...importedTab,
               chromeTabId: openTab.chromeTabId,
+              ...(openTab.windowId !== undefined ? { windowId: openTab.windowId } : {}),
               url: openTab.url,
               title: openTab.title,
               ...(openTab.faviconUrl ? { faviconUrl: openTab.faviconUrl } : {}),

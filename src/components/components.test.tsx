@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { createDefaultDocument, tabSpaceDocumentSchema } from '../model/document'
 import { createGroup } from '../model/groupOperations'
+import { createSpace } from '../model/spaceOperations'
 import { applyImport } from '../transfer/applyImport'
 import { parseImport } from '../transfer/importers'
 import { NewGroupDialog } from './NewGroupDialog'
@@ -32,27 +33,42 @@ function createDataTransfer() {
 }
 
 describe('workspace components', () => {
-  it('shows only currently open tabs in the sidebar', () => {
-    const initial = initialDocument()
+  it('shows all open tabs from the current window regardless of space', () => {
+    const withSecondSpace = createSpace(initialDocument(), 'Research', '🔬', {
+      now: () => NOW,
+      createId: () => 'space-2',
+    })
     const document = tabSpaceDocumentSchema.parse({
-      ...initial,
+      ...withSecondSpace,
       tabs: [
         {
-          id: 'open-tab', chromeTabId: 10, spaceId: 'space-1', url: 'https://open.example',
+          id: 'open-tab', chromeTabId: 10, windowId: 1, spaceId: 'space-1', url: 'https://open.example',
           title: 'Open tab', pinned: false, active: false, order: 0, lastAccessedAt: NOW,
           createdAt: NOW, updatedAt: NOW,
         },
         {
+          id: 'other-space-tab', chromeTabId: 11, windowId: 1, spaceId: 'space-2', url: 'https://research.example',
+          title: 'Other space tab', pinned: false, active: false, order: 0, lastAccessedAt: NOW,
+          createdAt: NOW, updatedAt: NOW,
+        },
+        {
+          id: 'other-window-tab', chromeTabId: 12, windowId: 2, spaceId: 'space-1', url: 'https://window.example',
+          title: 'Other window tab', pinned: false, active: false, order: 1, lastAccessedAt: NOW,
+          createdAt: NOW, updatedAt: NOW,
+        },
+        {
           id: 'saved-tab', spaceId: 'space-1', url: 'https://saved.example',
-          title: 'Saved tab', pinned: false, active: false, order: 1, lastAccessedAt: NOW,
+          title: 'Saved tab', pinned: false, active: false, order: 2, lastAccessedAt: NOW,
           createdAt: NOW, updatedAt: NOW,
         },
       ],
     })
 
-    render(<Sidebar document={document} activeSpaceName="My Space" onActionError={vi.fn()} />)
+    render(<Sidebar document={document} currentWindowId={1} onActionError={vi.fn()} />)
 
     expect(screen.getByText('Open tab')).toBeInTheDocument()
+    expect(screen.getByText('Other space tab')).toBeInTheDocument()
+    expect(screen.queryByText('Other window tab')).not.toBeInTheDocument()
     expect(screen.queryByText('Saved tab')).not.toBeInTheDocument()
   })
 
@@ -72,7 +88,7 @@ describe('workspace components', () => {
     })
     const updateDocument = vi.fn().mockResolvedValue(undefined)
     const dataTransfer = createDataTransfer()
-    render(<><Sidebar document={document} activeSpaceName="My Space" onActionError={vi.fn()} /><Workspace document={document} updateDocument={updateDocument} onError={vi.fn()} /></>)
+    render(<><Sidebar document={document} currentWindowId={1} onActionError={vi.fn()} /><Workspace document={document} updateDocument={updateDocument} onError={vi.fn()} /></>)
 
     fireEvent.dragStart(screen.getByTitle('Drag to a group in the workspace'), { dataTransfer })
     fireEvent.drop(screen.getByRole('region', { name: 'Target group drop area' }), { dataTransfer })

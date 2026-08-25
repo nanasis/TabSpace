@@ -5,6 +5,7 @@ export interface ImportedTab {
   url: string
   alias?: string
   avatarEmoji?: string
+  faviconUrl?: string
 }
 
 export interface ImportedGroup {

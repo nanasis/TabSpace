@@ -39,8 +39,14 @@ describe('provider imports', () => {
       expect.objectContaining({
         name: 'Sources',
         tabs: [
-          expect.objectContaining({ title: 'Example' }),
-          expect.objectContaining({ title: 'MDN' }),
+          expect.objectContaining({
+            title: 'Example',
+            faviconUrl: 'https://example.com/favicon.ico',
+          }),
+          expect.objectContaining({
+            title: 'MDN',
+            faviconUrl: 'https://developer.mozilla.org/favicon.ico',
+          }),
         ],
       }),
     )
@@ -52,12 +58,12 @@ describe('provider imports', () => {
       ...initial,
       tabs: [
         {
-          id: 'open-match', chromeTabId: 10, spaceId: 'space-1', url: 'https://example.com/',
+          id: 'open-match', chromeTabId: 10, windowId: 1, spaceId: 'space-1', url: 'https://example.com/',
           title: 'Live Example', pinned: true, active: true, order: 0, lastAccessedAt: NOW,
           createdAt: NOW, updatedAt: NOW,
         },
         {
-          id: 'open-unmatched', chromeTabId: 11, spaceId: 'space-1', url: 'https://open.example/',
+          id: 'open-unmatched', chromeTabId: 11, windowId: 1, spaceId: 'space-1', url: 'https://open.example/',
           title: 'Still open', pinned: false, active: false, order: 1, lastAccessedAt: NOW,
           createdAt: NOW, updatedAt: NOW,
         },
@@ -76,7 +82,12 @@ describe('provider imports', () => {
 
     expect(replaced.tabs).toHaveLength(2)
     expect(replaced.tabs.find(({ chromeTabId }) => chromeTabId === 10)).toEqual(
-      expect.objectContaining({ groupId: replaced.groups[0]?.id, title: 'Live Example', pinned: true }),
+      expect.objectContaining({
+        groupId: replaced.groups[0]?.id,
+        title: 'Live Example',
+        pinned: true,
+        windowId: 1,
+      }),
     )
     expect(replaced.tabs.find(({ chromeTabId }) => chromeTabId === 11)).toEqual(
       expect.objectContaining({ groupId: undefined, spaceId: replaced.spaces[0]?.id }),

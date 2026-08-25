@@ -37,6 +37,7 @@ export const tabRecordSchema = z
   .object({
     id: idSchema,
     chromeTabId: z.number().int().nonnegative().optional(),
+    windowId: z.number().int().optional(),
     spaceId: idSchema,
     groupId: idSchema.optional(),
     url: z.string().max(8192),

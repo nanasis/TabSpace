@@ -1,5 +1,5 @@
 import { Settings2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import { useTabSpaceDocument } from './app/useTabSpaceDocument'
 import { ImportExportDialog } from './components/ImportExportDialog'
@@ -27,13 +27,19 @@ export function App({ repository }: AppProps) {
   const [selection, setSelection] = useState({ spaceId: '', count: 0 })
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [transferOpen, setTransferOpen] = useState(false)
+  const [currentWindowId, setCurrentWindowId] = useState<number>()
   const activeSpace = document?.spaces.find(({ id }) => id === document.settings.activeSpaceId)
+
+  useEffect(() => {
+    if (typeof chrome === 'undefined' || !chrome.windows?.getCurrent) return
+    void chrome.windows.getCurrent().then((window) => setCurrentWindowId(window.id))
+  }, [])
 
   return (
     <div className="flex min-h-screen bg-[#0b0b0f] text-zinc-100">
       <Sidebar
         document={document}
-        activeSpaceName={activeSpace?.name}
+        currentWindowId={currentWindowId}
         onActionError={setActionError}
       />
 

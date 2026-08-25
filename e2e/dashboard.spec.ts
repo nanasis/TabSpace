@@ -55,7 +55,7 @@ test.beforeEach(async ({ page }) => {
         update: async () => ({}),
         remove: async () => undefined,
       },
-      windows: { update: async () => ({}) },
+      windows: { update: async () => ({}), getCurrent: async () => ({ id: 2 }) },
       runtime: { getURL: (path: string) => `chrome-extension://test/${path}` },
     }
     Object.assign(globalThis.chrome, chromeApi)
@@ -79,4 +79,6 @@ test('opens settings, persists density, and previews a backup import', async ({ 
     buffer: Buffer.from(JSON.stringify(backup)),
   })
   await expect(page.getByText(/Ready to import 1 spaces, 0 groups, and 1 tabs/)).toBeVisible()
+  await page.getByRole('button', { name: 'Import', exact: true }).click()
+  await expect(page.getByRole('dialog', { name: 'Import & export' })).toBeHidden()
 })

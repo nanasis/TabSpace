@@ -14,6 +14,7 @@ function toSnapshot(tab: chrome.tabs.Tab): BrowserTabSnapshot | undefined {
 
   return {
     id: tab.id,
+    windowId: tab.windowId,
     url: tab.url ?? tab.pendingUrl ?? '',
     title: tab.title ?? 'Untitled tab',
     ...(tab.favIconUrl ? { faviconUrl: tab.favIconUrl } : {}),

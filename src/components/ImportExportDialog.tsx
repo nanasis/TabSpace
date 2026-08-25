@@ -43,6 +43,7 @@ export function ImportExportDialog({ document, updateDocument, onClose }: Import
       await updateDocument((current) => applyImport(current, preview, mode))
       setStatus(`Imported ${preview.spaces.length} spaces successfully.`)
       setPreview(undefined)
+      onClose()
     } catch {
       setError('TabSpace could not apply the import. Existing data was left unchanged.')
     }
