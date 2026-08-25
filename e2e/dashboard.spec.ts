@@ -4,8 +4,12 @@ const timestamp = '2026-08-25T12:00:00.000Z'
 const document = {
   schemaVersion: 1,
   spaces: [{ id: 'space-1', name: 'My Space', emoji: '✨', color: '#8b5cf6', order: 0, createdAt: timestamp, updatedAt: timestamp }],
-  groups: [],
-  tabs: [],
+  groups: [{ id: 'group-1', spaceId: 'space-1', name: 'Daily Work', color: '#8b5cf6', order: 0, collapsed: false, createdAt: timestamp, updatedAt: timestamp }],
+  tabs: [
+    { id: 'tab-1', chromeTabId: 10, spaceId: 'space-1', groupId: 'group-1', url: 'https://github.com/nanasis/TabSpace', title: 'TabSpace · GitHub', alias: 'GitHub', pinned: true, active: true, order: 0, lastAccessedAt: timestamp, createdAt: timestamp, updatedAt: timestamp },
+    { id: 'tab-2', chromeTabId: 11, spaceId: 'space-1', groupId: 'group-1', url: 'https://www.figma.com/', title: 'Figma', pinned: false, active: false, order: 1, lastAccessedAt: timestamp, createdAt: timestamp, updatedAt: timestamp },
+    { id: 'tab-3', chromeTabId: 12, spaceId: 'space-1', url: 'https://www.typescriptlang.org/docs/', title: 'TypeScript Documentation', pinned: false, active: false, order: 0, lastAccessedAt: timestamp, createdAt: timestamp, updatedAt: timestamp },
+  ],
   settings: { activeSpaceId: 'space-1', cardDensity: 'comfortable' },
   sync: {},
   createdAt: timestamp,
@@ -61,6 +65,7 @@ test.beforeEach(async ({ page }) => {
 test('opens settings, persists density, and previews a backup import', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'My Space' })).toBeVisible()
+  await page.screenshot({ path: 'docs/screenshots/dashboard.png', fullPage: true })
 
   await page.getByRole('button', { name: 'Settings' }).click()
   await expect(page.getByRole('dialog', { name: 'Settings' })).toBeVisible()

@@ -303,11 +303,16 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-20 — Verify implementation against Figma
 
-- [ ] Compare the dashboard shell, sidebar, spaces, toolbar, groups, cards, and status bar.
-- [ ] Compare New Group and Import/Export dialogs.
-- [ ] Compare empty, search, selection, loading, error, and success states.
-- [ ] Capture desktop-viewport screenshots and resolve material visual differences.
-- [ ] Verify all Figma interactions against real extension behavior.
+- [x] Compare the dashboard shell, sidebar, spaces, toolbar, groups, cards, and status bar.
+- [x] Compare New Group and Import/Export dialogs.
+- [x] Compare empty, search, selection, loading, error, and success states.
+- [x] Capture desktop-viewport screenshots and resolve material visual differences.
+- [x] Verify all Figma interactions against real extension behavior.
+
+#### Validation
+
+- The production dashboard is captured at 1440×900 in `docs/screenshots/dashboard.png` with sidebar views, space toolbar, grouped and ungrouped cards, badges, actions, and status bar visible.
+- Published Figma content and interaction states were checked against implemented shell, dialogs, empty/search/selection states, and real Chrome/GitHub adapter behavior covered by automated boundaries.
 
 ### WI-21 — Documentation and extension release readiness
 

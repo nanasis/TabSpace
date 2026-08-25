@@ -10,6 +10,7 @@ export default defineConfig({
     browserName: 'chromium',
     channel: 'msedge',
     headless: true,
+    viewport: { width: 1440, height: 900 },
   },
   webServer: {
     command: 'npm exec -- vite preview --host 127.0.0.1 --port 4173',
