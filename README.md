@@ -2,6 +2,8 @@
 
 TabSpace is a privacy-conscious Chrome extension for organizing open and saved tabs into persistent spaces and groups. It provides a full-page dashboard, real Chrome tab controls, portable backups, compatible exports, and optional private GitHub Gist synchronization.
 
+**Project website:** <https://nanasis.github.io/TabSpace/>
+
 ![TabSpace dashboard](docs/screenshots/dashboard.png)
 
 ## Features
