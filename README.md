@@ -69,7 +69,7 @@ Search matches aliases, titles, domains, and URLs. Card controls activate/open, 
 Open **Settings → Import or export data**. Choose the provider before selecting or dropping a JSON file; TabSpace intentionally does not guess the provider.
 
 - **Toby:** organization, account, and list-array JSON exports using collections (`lists`) and links (`cards`)
-- **Tabme:** backup profile using spaces, folders/collections, and bookmarks/tabs; see the sanitized fixture at `src/transfer/fixtures/tabme-backup.json`
+- **Tabme:** backup profile using spaces, folders/collections, and `items`; direct links and nested `groupItems` are flattened into their containing TabSpace group. See the sanitized fixture at `src/transfer/fixtures/tabme-backup.json`
 - **TabSpace:** canonical `tabspace-backup.json`
 
 Review the preview and warnings, then choose **Merge** or confirmed **Replace**. Unsupported or unsafe non-HTTP(S) URLs are skipped and reported. The sanitized Toby fixture is at `src/transfer/fixtures/toby-export.json`.

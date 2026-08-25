@@ -350,11 +350,14 @@ A work item is not complete until all seven steps pass. Material design differen
 - [x] Drop an open tab onto **New group** to create a uniquely named default group and move the tab atomically.
 - [x] Drag tab cards between groups or back to Ungrouped.
 - [x] Show clear highlighted drop targets while preserving select-based keyboard movement.
+- [x] Parse Tabme `folders[].items` and recursively flatten nested `groupItems` into the containing group.
+- [x] Preserve currently open Chrome tabs during Replace imports and attach matching live tabs to imported URL records.
 
 ### Validation
 
-- `npm run validate` passes ESLint, TypeScript, 60 Vitest tests, extension and website builds, manifest reference verification, and Playwright E2E.
+- `npm run validate` passes ESLint, TypeScript, 61 Vitest tests, extension and website builds, manifest reference verification, and Playwright E2E.
 - Component tests cover open-only sidebar rendering, sidebar-to-group dragging, and group-to-group card dragging. Domain tests cover default-group creation, collision-safe naming, and atomic tab movement.
+- Import tests cover Tabme direct items, nested group items, and Replace behavior for matched and unmatched open tabs. A shape-only check against a real Tabme backup produced 1 space, 28 groups, and 259 tabs with no skipped records; no private titles or URLs were logged or retained.
 
 ## Completion checklist
 

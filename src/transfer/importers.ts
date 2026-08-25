@@ -79,27 +79,47 @@ function toImportedSpace(
   }
 }
 
-const tabmeTabSchema = z.object({ url: z.string(), title: z.string().optional(), name: z.string().optional() }).passthrough()
+interface TabmeItem {
+  url?: string
+  title?: string
+  name?: string
+  groupItems?: TabmeItem[]
+}
+
+const tabmeItemSchema: z.ZodType<TabmeItem> = z.lazy(() =>
+  z.object({
+    url: z.string().optional(),
+    title: z.string().optional(),
+    name: z.string().optional(),
+    groupItems: z.array(tabmeItemSchema).optional(),
+  }).passthrough(),
+)
 const tabmeFolderSchema = z.object({
   name: z.string().optional(),
   title: z.string().optional(),
-  bookmarks: z.array(tabmeTabSchema).optional(),
-  tabs: z.array(tabmeTabSchema).optional(),
+  color: z.string().optional(),
+  bookmarks: z.array(tabmeItemSchema).optional(),
+  tabs: z.array(tabmeItemSchema).optional(),
+  items: z.array(tabmeItemSchema).optional(),
 }).passthrough()
 const tabmeSpaceSchema = z.object({
   name: z.string().optional(),
   title: z.string().optional(),
   folders: z.array(tabmeFolderSchema).optional(),
   collections: z.array(tabmeFolderSchema).optional(),
-  bookmarks: z.array(tabmeTabSchema).optional(),
-  tabs: z.array(tabmeTabSchema).optional(),
+  bookmarks: z.array(tabmeItemSchema).optional(),
+  tabs: z.array(tabmeItemSchema).optional(),
+  items: z.array(tabmeItemSchema).optional(),
 }).passthrough()
 
-function normalizeTabmeTabs(rawTabs: z.infer<typeof tabmeTabSchema>[], counter: { skipped: number }) {
-  return rawTabs.flatMap((rawTab) => {
-    const tab = safeTab(rawTab.url, rawTab.title ?? rawTab.name)
+function normalizeTabmeItems(rawItems: TabmeItem[], counter: { skipped: number }): ImportedTab[] {
+  return rawItems.flatMap((rawItem) => {
+    const nestedTabs = normalizeTabmeItems(rawItem.groupItems ?? [], counter)
+    if (!rawItem.url) return nestedTabs
+
+    const tab = safeTab(rawItem.url, rawItem.title ?? rawItem.name)
     if (!tab) counter.skipped += 1
-    return tab ? [tab] : []
+    return tab ? [tab, ...nestedTabs] : nestedTabs
   })
 }
 
@@ -115,13 +135,17 @@ function parseTabme(input: unknown): ImportPreview {
     const folders = space.data.folders ?? space.data.collections ?? []
     const groups: ImportedGroup[] = folders.map((folder, folderIndex) => ({
       name: folder.name?.trim() || folder.title?.trim() || `Folder ${folderIndex + 1}`,
-      tabs: normalizeTabmeTabs(folder.bookmarks ?? folder.tabs ?? [], counter),
+      ...(folder.color ? { color: folder.color } : {}),
+      tabs: normalizeTabmeItems(folder.bookmarks ?? folder.tabs ?? folder.items ?? [], counter),
     }))
     return [{
       name: space.data.name?.trim() || space.data.title?.trim() || `Tabme Space ${spaceIndex + 1}`,
       emoji: '📥',
       groups,
-      ungroupedTabs: normalizeTabmeTabs(space.data.bookmarks ?? space.data.tabs ?? [], counter),
+      ungroupedTabs: normalizeTabmeItems(
+        space.data.bookmarks ?? space.data.tabs ?? space.data.items ?? [],
+        counter,
+      ),
     }]
   })
   if (!spaces.length) throw new Error('The Tabme backup contains no spaces')

@@ -1,20 +1,51 @@
 {
+  "isTabme": true,
   "version": 1,
   "spaces": [
     {
-      "name": "Research",
+      "id": 1,
+      "objectType": "space",
+      "position": "a0",
+      "title": "Research",
       "folders": [
         {
-          "name": "Sources",
-          "bookmarks": [
+          "id": 2,
+          "objectType": "folder",
+          "position": "a0",
+          "title": "Sources",
+          "color": "#8b5cf6",
+          "collapsed": false,
+          "items": [
             {
+              "id": 3,
+              "objectType": "bookmark",
+              "position": "a0",
               "title": "Example",
-              "url": "https://example.com/"
+              "type": "bookmark",
+              "url": "https://example.com/",
+              "favIconUrl": "https://example.com/favicon.ico",
+              "tags": []
+            },
+            {
+              "id": 4,
+              "position": "a1",
+              "title": "Nested links",
+              "type": "group",
+              "groupItems": [
+                {
+                  "id": 5,
+                  "position": "a0",
+                  "title": "MDN",
+                  "type": "bookmark",
+                  "url": "https://developer.mozilla.org/",
+                  "favIconUrl": "https://developer.mozilla.org/favicon.ico",
+                  "tags": []
+                }
+              ]
             }
           ]
         }
-      ],
-      "bookmarks": []
+      ]
     }
   ]
 }

@@ -10,6 +10,14 @@ export interface ApplyImportOptions {
 
 const DEFAULT_COLORS = ['#8b5cf6', '#3b82f6', '#14b8a6', '#f59e0b', '#ec4899']
 
+function canonicalUrl(url: string) {
+  try {
+    return new URL(url).href
+  } catch {
+    return url
+  }
+}
+
 function validColor(color: string | undefined, index: number) {
   return color && /^#[0-9a-f]{6}$/i.test(color)
     ? color
@@ -78,6 +86,50 @@ export function applyImport(
   })
 
   const firstImportedSpaceId = spaces[mode === 'merge' ? document.spaces.length : 0]?.id
+
+  if (mode === 'replace' && firstImportedSpaceId) {
+    let ungroupedOrder = tabs.filter(
+      (tab) => tab.spaceId === firstImportedSpaceId && tab.groupId === undefined,
+    ).length
+
+    document.tabs
+      .filter((tab): tab is TabRecord & { chromeTabId: number } => tab.chromeTabId !== undefined)
+      .forEach((openTab) => {
+        const importedIndex = tabs.findIndex(
+          (tab) =>
+            tab.chromeTabId === undefined && canonicalUrl(tab.url) === canonicalUrl(openTab.url),
+        )
+
+        if (importedIndex >= 0) {
+          const importedTab = tabs[importedIndex]
+          if (importedTab) {
+            tabs[importedIndex] = {
+              ...importedTab,
+              chromeTabId: openTab.chromeTabId,
+              url: openTab.url,
+              title: openTab.title,
+              ...(openTab.faviconUrl ? { faviconUrl: openTab.faviconUrl } : {}),
+              pinned: openTab.pinned,
+              active: openTab.active,
+              lastAccessedAt: openTab.lastAccessedAt,
+              updatedAt,
+            }
+          }
+          return
+        }
+
+        tabs.push({
+          ...openTab,
+          id: tabs.some(({ id }) => id === openTab.id) ? createId() : openTab.id,
+          spaceId: firstImportedSpaceId,
+          groupId: undefined,
+          order: ungroupedOrder,
+          updatedAt,
+        })
+        ungroupedOrder += 1
+      })
+  }
+
   return tabSpaceDocumentSchema.parse({
     ...document,
     spaces,

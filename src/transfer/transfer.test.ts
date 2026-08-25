@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { createDefaultDocument } from '../model/document'
+import { createDefaultDocument, tabSpaceDocumentSchema } from '../model/document'
 import { applyImport } from './applyImport'
 import { createBookmarksHtml, createMarkdown, createOneTabText } from './exports'
 import { parseImport } from './importers'
@@ -26,15 +26,60 @@ describe('provider imports', () => {
     expect(preview.skippedRecords).toBe(1)
   })
 
-  it('parses the documented Tabme backup profile', () => {
+  it('parses Tabme folder items and nested groupItems', () => {
     const preview = parseImport('tabme', {
-      spaces: [{ name: 'Research', folders: [{ name: 'Sources', bookmarks: [
+      isTabme: true,
+      spaces: [{ title: 'Research', folders: [{ title: 'Sources', items: [
         { title: 'Example', url: 'https://example.com' },
+        { title: 'Nested', groupItems: [{ title: 'MDN', url: 'https://developer.mozilla.org/' }] },
       ] }] }],
     })
 
     expect(preview.spaces[0]?.groups[0]).toEqual(
-      expect.objectContaining({ name: 'Sources', tabs: [expect.objectContaining({ title: 'Example' })] }),
+      expect.objectContaining({
+        name: 'Sources',
+        tabs: [
+          expect.objectContaining({ title: 'Example' }),
+          expect.objectContaining({ title: 'MDN' }),
+        ],
+      }),
+    )
+  })
+
+  it('preserves open tabs and connects matching imported URLs during Replace', () => {
+    const initial = createDefaultDocument({ now: () => NOW, createId: () => 'space-1' })
+    const withOpenTabs = tabSpaceDocumentSchema.parse({
+      ...initial,
+      tabs: [
+        {
+          id: 'open-match', chromeTabId: 10, spaceId: 'space-1', url: 'https://example.com/',
+          title: 'Live Example', pinned: true, active: true, order: 0, lastAccessedAt: NOW,
+          createdAt: NOW, updatedAt: NOW,
+        },
+        {
+          id: 'open-unmatched', chromeTabId: 11, spaceId: 'space-1', url: 'https://open.example/',
+          title: 'Still open', pinned: false, active: false, order: 1, lastAccessedAt: NOW,
+          createdAt: NOW, updatedAt: NOW,
+        },
+      ],
+    })
+    const preview = parseImport('tabme', {
+      spaces: [{ title: 'Imported', folders: [{ title: 'Sources', items: [
+        { title: 'Saved Example', url: 'https://example.com' },
+      ] }] }],
+    })
+
+    const replaced = applyImport(withOpenTabs, preview, 'replace', {
+      now: () => NOW,
+      createId: ids(),
+    })
+
+    expect(replaced.tabs).toHaveLength(2)
+    expect(replaced.tabs.find(({ chromeTabId }) => chromeTabId === 10)).toEqual(
+      expect.objectContaining({ groupId: replaced.groups[0]?.id, title: 'Live Example', pinned: true }),
+    )
+    expect(replaced.tabs.find(({ chromeTabId }) => chromeTabId === 11)).toEqual(
+      expect.objectContaining({ groupId: undefined, spaceId: replaced.spaces[0]?.id }),
     )
   })
 
