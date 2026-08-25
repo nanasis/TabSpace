@@ -336,18 +336,18 @@ A work item is not complete until all seven steps pass. Material design differen
 - [x] Build the static website with the repository toolchain.
 - [x] Add a GitHub Actions workflow that validates and deploys the site to GitHub Pages.
 - [x] Document Pages repository settings and deployment behavior.
-- [!] Verify the production build and deployed URL.
+- [x] Verify the production build and deployed URL.
 
-#### Validation in progress
+#### Validation
 
 - `npm run build:site` produces the static `site-dist/` artifact with the `/TabSpace/` base path. Desktop and 390px mobile smoke checks passed in Microsoft Edge, and `docs/screenshots/website.png` captures the complete production page.
-- The production build is verified locally. Deployment verification is externally blocked: the unauthenticated Actions endpoint and `https://nanasis.github.io/TabSpace/` currently return 404, and this environment has no authenticated GitHub CLI session. Enable **Settings → Pages → Source: GitHub Actions** (and private-repository Pages access if applicable), then rerun `Validate and deploy Pages`.
+- The GitHub Actions deployment completed after Pages was enabled. `https://nanasis.github.io/TabSpace/` returned HTTP 200 with the expected title; deployed desktop and mobile browser checks verified the hero, dashboard image asset, navigation, and absence of page errors.
 
 ## Completion checklist
 
-- [ ] Every WI-01 through WI-22 is completed, reviewed, validated, committed, and pushed.
+- [x] Every WI-01 through WI-22 is completed, reviewed, validated, committed, and pushed.
 - [x] The extension can be installed as an unpacked Chrome extension from a clean build.
 - [x] The extension follows the published Figma design.
 - [x] Toby, Tabme, and TabSpace imports work through explicit provider selection.
 - [x] No credentials or private tab data are committed to the repository.
-- [ ] GitHub Pages is built and deployed through GitHub Actions.
+- [x] GitHub Pages is built and deployed through GitHub Actions.
