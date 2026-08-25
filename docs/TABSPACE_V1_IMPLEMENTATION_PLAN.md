@@ -127,12 +127,17 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-07 — Implement the Figma sidebar
 
-- [ ] Add the TabSpace branding and v1 label.
-- [ ] Add Open and Pinned views with counts.
-- [ ] List active-space tabs with avatar, title, active state, and pin state.
-- [ ] Activate browser tabs from the sidebar.
-- [ ] Show tabs, groups, pinned, and global totals.
-- [ ] Add the designed empty state.
+- [x] Add the TabSpace branding and v1 label.
+- [x] Add Open and Pinned views with counts.
+- [x] List active-space tabs with avatar, title, active state, and pin state.
+- [x] Activate browser tabs from the sidebar.
+- [x] Show tabs, groups, pinned, and global totals.
+- [x] Add the designed empty state.
+
+#### Validation
+
+- `npm run validate` passed on 2026-08-25 with live active-space and pinned tab views, browser activation, totals, and empty states.
+- The canonical tab record now tracks Chrome's active state during reconciliation without changing user-owned organization fields.
 
 ### WI-08 — Implement user-created spaces
 

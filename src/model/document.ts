@@ -45,6 +45,7 @@ export const tabRecordSchema = z
     alias: z.string().trim().min(1).max(512).optional(),
     avatarEmoji: z.string().trim().min(1).max(16).optional(),
     pinned: z.boolean(),
+    active: z.boolean().default(false),
     order: orderSchema,
     lastAccessedAt: timestampSchema,
     createdAt: timestampSchema,

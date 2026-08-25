@@ -47,6 +47,7 @@ function tabChanged(record: TabRecord, tab: BrowserTabSnapshot, nextAccessedAt: 
     record.title !== tab.title ||
     record.faviconUrl !== tab.faviconUrl ||
     record.pinned !== tab.pinned ||
+    record.active !== tab.active ||
     (tab.active && record.lastAccessedAt !== nextAccessedAt)
   )
 }
@@ -121,6 +122,7 @@ export function reconcileTabs(
           title: tab.title,
           ...(tab.faviconUrl ? { faviconUrl: tab.faviconUrl } : { faviconUrl: undefined }),
           pinned: tab.pinned,
+          active: tab.active,
           lastAccessedAt: tab.active ? nextAccessedAt : existing.lastAccessedAt,
           updatedAt: timestamp,
         }
@@ -137,6 +139,7 @@ export function reconcileTabs(
       title: tab.title,
       ...(tab.faviconUrl ? { faviconUrl: tab.faviconUrl } : {}),
       pinned: tab.pinned,
+      active: tab.active,
       order: nextOrder,
       lastAccessedAt: nextAccessedAt,
       createdAt: timestamp,
