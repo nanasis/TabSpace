@@ -6,6 +6,7 @@ TabSpace is a privacy-conscious Chrome extension for organizing open and saved t
 
 ## Features
 
+- Replace Chrome's default new-tab page with the TabSpace dashboard
 - Discover and reconcile open Chrome tabs without duplicates
 - Activate, close, pin, search, alias, and add emoji avatars to tabs
 - Create, rename, recolor, reorder, and safely delete spaces and groups
@@ -50,9 +51,9 @@ Available commands:
 3. Enable **Developer mode**.
 4. Select **Load unpacked**.
 5. Choose this repository's `dist/` directory.
-6. Pin TabSpace and select its toolbar icon.
+6. Open a new Chrome tab to use TabSpace as the default new-tab page. The toolbar icon also opens or focuses an existing TabSpace dashboard.
 
-After changing source code, rebuild and select **Reload** on the TabSpace extension card.
+After changing source code, rebuild and select **Reload** on the TabSpace extension card. Chrome allows only one extension to control the new-tab page; if another extension already does so, Chrome may ask which override to keep.
 
 ## Usage
 

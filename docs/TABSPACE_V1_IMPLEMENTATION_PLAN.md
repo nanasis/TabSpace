@@ -354,11 +354,13 @@ A work item is not complete until all seven steps pass. Material design differen
 - [x] Preserve currently open Chrome tabs during Replace imports and attach matching live tabs to imported URL records.
 - [x] Show every open tab from the dashboard's current Chrome window in the sidebar, independent of TabSpace space/group assignment.
 - [x] Close Import/Export automatically after a successful import and retain sanitized imported favicon URLs with a site fallback.
+- [x] Register the TabSpace dashboard as Chrome's Manifest V3 new-tab override while retaining toolbar open-or-focus behavior.
 
 ### Validation
 
 - `npm run validate` passes ESLint, TypeScript, 61 Vitest tests, extension and website builds, manifest reference verification, and Playwright E2E.
 - Component tests cover open-only sidebar rendering, sidebar-to-group dragging, and group-to-group card dragging. Domain tests cover default-group creation, collision-safe naming, and atomic tab movement.
+- Production build verification requires `chrome_url_overrides.newtab` to reference the built dashboard entry page.
 - Import tests cover Tabme direct items, nested group items, favicon fallback, and Replace behavior for matched and unmatched open tabs. Sidebar coverage verifies current-window filtering across multiple TabSpace spaces, and E2E verifies successful import dismissal. A shape-only check against a real Tabme backup produced 1 space, 28 groups, and 259 tabs with 259 favicon values and no skipped records; no private titles or URLs were logged or retained.
 
 ## Completion checklist

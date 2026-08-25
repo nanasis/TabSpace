@@ -13,8 +13,12 @@ if (typeof manifest.background?.service_worker !== 'string') {
   throw new Error('The production manifest must declare a background service worker')
 }
 
+if (manifest.chrome_url_overrides?.newtab !== 'index.html') {
+  throw new Error('The production manifest must register TabSpace as the Chrome new-tab page')
+}
+
 const requiredFiles = new Set([
-  'index.html',
+  manifest.chrome_url_overrides.newtab,
   manifest.background.service_worker,
   ...Object.values(manifest.icons ?? {}),
   ...Object.values(manifest.action?.default_icon ?? {}),
