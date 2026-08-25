@@ -1,0 +1,6 @@
+{
+  "manifest_version": 3,
+  "name": "TabSpace",
+  "version": "0.1.0",
+  "description": "Organize and manage your open tabs in focused spaces."
+}

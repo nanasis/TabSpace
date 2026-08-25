@@ -1,0 +1,60 @@
+{
+  "name": "tabspace",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A focused Chrome extension for organizing and managing open tabs.",
+  "type": "module",
+  "packageManager": "npm@12.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "lint": "eslint . --max-warnings 0",
+    "typecheck": "tsc -b",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "tsc -b && vite build",
+    "validate": "npm run lint && npm run typecheck && npm run test && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nanasis/TabSpace.git"
+  },
+  "keywords": [
+    "chrome-extension",
+    "tab-manager"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nanasis/TabSpace/issues"
+  },
+  "homepage": "https://github.com/nanasis/TabSpace#readme",
+  "dependencies": {
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "lucide-react": "^1.31.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tailwindcss/vite": "^4.3.3",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.5",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^6.0.5",
+    "eslint": "^10.8.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.4",
+    "globals": "^17.11.0",
+    "jsdom": "^30.0.1",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.67.1-alpha.4",
+    "vite": "^8.2.1",
+    "vitest": "^4.1.10"
+  }
+}

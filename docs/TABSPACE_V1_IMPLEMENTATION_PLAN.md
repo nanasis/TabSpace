@@ -59,11 +59,16 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-02 — Create the extension project
 
-- [ ] Configure React, TypeScript, Vite, and a package manager.
-- [ ] Configure Tailwind CSS or equivalent design styling.
-- [ ] Add Lucide icons, Inter, and JetBrains Mono.
-- [ ] Add development, lint, type-check, test, and production-build commands.
-- [ ] Produce a loadable unpacked-extension directory.
+- [x] Configure React, TypeScript, Vite, and npm.
+- [x] Configure Tailwind CSS.
+- [x] Add Lucide icons, Inter, and JetBrains Mono.
+- [x] Add development, lint, type-check, test, and production-build commands.
+- [x] Produce a loadable unpacked-extension directory.
+
+#### Validation
+
+- `npm run validate` passed on 2026-08-25: ESLint, TypeScript, Vitest (1 test), and the Vite production build.
+- The `dist/` smoke check confirmed a parseable Manifest V3 file and the built dashboard entry page.
 
 ### WI-03 — Configure Manifest V3 and extension runtime
 
