@@ -17,6 +17,10 @@
   box-sizing: border-box;
 }
 
+.icon-button {
+  @apply grid size-8 shrink-0 place-items-center rounded-lg border border-white/10 text-zinc-500 transition hover:border-white/20 hover:text-zinc-200;
+}
+
 html,
 body,
 #root {

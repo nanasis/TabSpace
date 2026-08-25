@@ -141,12 +141,17 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-08 — Implement user-created spaces
 
-- [ ] Create unlimited spaces with name and emoji.
-- [ ] Switch, rename, recolor/re-emoji, order, and delete spaces.
-- [ ] Prevent unsafe deletion of the final space.
-- [ ] Apply the documented tab-relocation behavior during deletion.
-- [ ] Persist space order and the active space.
-- [ ] Show per-space tab and group counts.
+- [x] Create unlimited spaces with name and emoji.
+- [x] Switch, rename, recolor/re-emoji, order, and delete spaces.
+- [x] Prevent unsafe deletion of the final space.
+- [x] Apply the documented tab-relocation behavior during deletion.
+- [x] Persist space order and the active space.
+- [x] Show per-space tab and group counts.
+
+#### Validation
+
+- `npm run validate` passed on 2026-08-25 with 27 tests and the production extension build.
+- Space operation tests cover creation and activation, rename/reorder, safe tab relocation with group removal, and final-space deletion prevention.
 
 ### WI-09 — Implement groups
 

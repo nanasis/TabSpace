@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 
 import { useTabSpaceDocument } from './app/useTabSpaceDocument'
 import { Sidebar } from './components/Sidebar'
+import { SpaceBar } from './components/SpaceBar'
 import {
   createChromeDocumentRepository,
   type DocumentRepository,
@@ -17,7 +18,7 @@ export function App({ repository }: AppProps) {
     () => repository ?? createChromeDocumentRepository(),
     [repository],
   )
-  const { document, error, loading } = useTabSpaceDocument(documentRepository)
+  const { document, error, loading, updateDocument } = useTabSpaceDocument(documentRepository)
   const [actionError, setActionError] = useState<string>()
   const activeSpace = document?.spaces.find(({ id }) => id === document.settings.activeSpaceId)
 
@@ -61,6 +62,14 @@ export function App({ repository }: AppProps) {
             <Settings2 className="size-4" />
           </button>
         </header>
+
+        {document ? (
+          <SpaceBar
+            document={document}
+            updateDocument={updateDocument}
+            onError={setActionError}
+          />
+        ) : null}
 
         <main className="flex-1 p-4 sm:p-7" aria-labelledby="workspace-title">
           <div className="mx-auto max-w-7xl">
