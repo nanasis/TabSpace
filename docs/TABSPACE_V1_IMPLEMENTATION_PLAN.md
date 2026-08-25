@@ -247,13 +247,18 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-16 — Implement GitHub Gist synchronization
 
-- [ ] Reproduce the Figma Gist synchronization section without simulated behavior.
-- [ ] Implement secure GitHub authentication without embedded secrets.
-- [ ] Create and update a private Gist containing canonical TabSpace JSON.
-- [ ] Persist only non-secret Gist metadata.
-- [ ] Add pull/restore and conflict-safe update behavior.
-- [ ] Show authentication, syncing, success, failure, rate-limit, and revoked-access states.
-- [ ] Warn that tab titles and URLs can contain sensitive information.
+- [x] Reproduce the Figma Gist synchronization section without simulated behavior.
+- [x] Implement secure GitHub authentication without embedded secrets.
+- [x] Create and update a private Gist containing canonical TabSpace JSON.
+- [x] Persist only non-secret Gist metadata.
+- [x] Add pull/restore and conflict-safe update behavior.
+- [x] Show authentication, syncing, success, failure, rate-limit, and revoked-access states.
+- [x] Warn that tab titles and URLs can contain sensitive information.
+
+#### Validation
+
+- GitHub client tests cover token validation, private Gist creation, conditional revision updates, validated pulls, and revoked/rate-limited API errors.
+- Fine-grained tokens are held only in `chrome.storage.session`; local documents and backup exports contain only Gist ID, timestamp, and revision metadata.
 
 ### WI-17 — Implement dialogs and feedback
 

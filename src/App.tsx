@@ -111,6 +111,7 @@ export function App({ repository }: AppProps) {
             setSettingsOpen(false)
             setTransferOpen(true)
           }}
+          updateDocument={updateDocument}
         />
       ) : null}
 

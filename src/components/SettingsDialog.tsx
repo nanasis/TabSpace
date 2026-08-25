@@ -2,15 +2,17 @@ import { Database, GitBranch, Import, ShieldCheck, X } from 'lucide-react'
 import { useEffect } from 'react'
 
 import type { Settings, TabSpaceDocument } from '../model/document'
+import { GistSyncSection } from './GistSyncSection'
 
 export interface SettingsDialogProps {
   document: TabSpaceDocument
   onChange(updates: Partial<Settings>): void
   onClose(): void
   onOpenDataTransfer(): void
+  updateDocument(transform: (document: TabSpaceDocument) => TabSpaceDocument): Promise<void>
 }
 
-export function SettingsDialog({ document, onChange, onClose, onOpenDataTransfer }: SettingsDialogProps) {
+export function SettingsDialog({ document, onChange, onClose, onOpenDataTransfer, updateDocument }: SettingsDialogProps) {
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose()
@@ -72,6 +74,8 @@ export function SettingsDialog({ document, onChange, onClose, onOpenDataTransfer
             </p>
             <button className="mt-3 flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs text-zinc-300 hover:border-violet-400/30" onClick={onOpenDataTransfer} type="button"><Import className="size-3.5" /> Import or export data</button>
           </div>
+
+          <GistSyncSection document={document} updateDocument={updateDocument} />
 
           <div className="rounded-xl border border-white/8 bg-black/15 p-4">
             <div className="flex items-center gap-2 text-sm font-medium"><ShieldCheck className="size-4 text-emerald-400" />Privacy</div>
