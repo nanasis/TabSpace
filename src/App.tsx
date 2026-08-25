@@ -21,6 +21,7 @@ export function App({ repository }: AppProps) {
   )
   const { document, error, loading, updateDocument } = useTabSpaceDocument(documentRepository)
   const [actionError, setActionError] = useState<string>()
+  const [selection, setSelection] = useState({ spaceId: '', count: 0 })
   const activeSpace = document?.spaces.find(({ id }) => id === document.settings.activeSpaceId)
 
   return (
@@ -82,9 +83,13 @@ export function App({ repository }: AppProps) {
 
             {document ? (
               <Workspace
+                key={document.settings.activeSpaceId}
                 document={document}
                 updateDocument={updateDocument}
                 onError={setActionError}
+                onSelectionCountChange={(count) =>
+                  setSelection({ spaceId: document.settings.activeSpaceId, count })
+                }
               />
             ) : (
               <p className="py-20 text-center text-sm text-zinc-600">Preparing your workspace…</p>
@@ -93,7 +98,13 @@ export function App({ repository }: AppProps) {
         </main>
 
         <footer className="flex h-9 items-center justify-between border-t border-white/8 px-4 font-mono text-[10px] text-zinc-600 sm:px-7">
-          <span>{document ? `${document.tabs.length} tabs in space` : 'Starting TabSpace'}</span>
+          <span>
+            {selection.spaceId === document?.settings.activeSpaceId && selection.count
+              ? `${selection.count} tabs selected`
+              : document
+                ? `${document.tabs.filter(({ spaceId }) => spaceId === document.settings.activeSpaceId).length} tabs in space`
+                : 'Starting TabSpace'}
+          </span>
           <span>Local · private</span>
         </footer>
       </div>

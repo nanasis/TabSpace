@@ -168,20 +168,30 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-10 — Implement tab cards and actions
 
-- [ ] Reproduce the responsive Figma card grid.
-- [ ] Show alias/title, avatar/favicon, domain, active/pinned badges, and last-accessed time.
-- [ ] Support selection and Ctrl/Cmd/Shift multi-selection.
-- [ ] Rename aliases and choose custom emoji avatars.
-- [ ] Pin/unpin, move/remove group, copy URL, open/activate, and close tabs.
-- [ ] Render Ungrouped tabs separately.
+- [x] Reproduce the responsive Figma card grid.
+- [x] Show alias/title, avatar/favicon, domain, active/pinned badges, and last-accessed time.
+- [x] Support selection and Ctrl/Cmd/Shift multi-selection.
+- [x] Rename aliases and choose custom emoji avatars.
+- [x] Pin/unpin, move/remove group, copy URL, open/activate, and close tabs.
+- [x] Render Ungrouped tabs separately.
+
+#### Validation
+
+- `npm run validate` passed on 2026-08-25 with 37 tests and the production extension build.
+- Tab operation tests cover aliases/avatars, group assignment and removal, and invalid cross-space destinations.
 
 ### WI-11 — Implement search and bulk actions
 
-- [ ] Search active-space aliases, titles, domains, and URLs as the user types.
-- [ ] Clear search and hide empty filtered groups.
-- [ ] Show the designed no-results state.
-- [ ] Show selected count, bulk destination selector, move action, and clear action.
-- [ ] Show selection state in the status bar.
+- [x] Search active-space aliases, titles, domains, and URLs as the user types.
+- [x] Clear search and hide empty filtered groups.
+- [x] Show the designed no-results state.
+- [x] Show selected count, bulk destination selector, move action, and clear action.
+- [x] Show selection state in the status bar.
+
+#### Validation
+
+- Search tests verify case-insensitive alias, title, domain, and URL matching plus no-match behavior.
+- The responsive workspace supports modifier/range selection and persistent bulk movement to any space or group.
 
 ### WI-12 — Implement persistent organization and reconciliation
 

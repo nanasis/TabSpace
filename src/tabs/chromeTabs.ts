@@ -43,6 +43,14 @@ export async function activateBrowserTab(tabId: number) {
   }
 }
 
+export async function openBrowserTab(url: string) {
+  try {
+    await chrome.tabs.create({ url })
+  } catch (error) {
+    throw new BrowserTabError('open', { cause: error })
+  }
+}
+
 export async function closeBrowserTab(tabId: number) {
   try {
     await chrome.tabs.remove(tabId)
