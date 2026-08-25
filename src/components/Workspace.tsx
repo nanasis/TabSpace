@@ -9,12 +9,19 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
-import { useMemo, useRef, useState, type MouseEvent } from 'react'
+import { useMemo, useRef, useState, type DragEvent, type MouseEvent } from 'react'
 
 import type { TabRecord, TabSpaceDocument } from '../model/document'
-import { createGroup, deleteGroup, moveGroup, updateGroup } from '../model/groupOperations'
+import {
+  createDefaultGroupForTab,
+  createGroup,
+  deleteGroup,
+  moveGroup,
+  updateGroup,
+} from '../model/groupOperations'
 import { moveTab } from '../model/tabOperations'
 import { searchTabs } from '../tabs/searchTabs'
+import { readTabDragPayload } from '../tabs/tabDrag'
 import { NewGroupDialog } from './NewGroupDialog'
 import { TabCard } from './TabCard'
 
@@ -29,6 +36,7 @@ export function Workspace({ document, updateDocument, onError, onSelectionCountC
   const [showNewGroup, setShowNewGroup] = useState(false)
   const [query, setQuery] = useState('')
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [dropTarget, setDropTarget] = useState<string>()
   const activeSpaceId = document.settings.activeSpaceId
   const [destination, setDestination] = useState(`space:${activeSpaceId}`)
   const lastSelectedId = useRef<string | undefined>(undefined)
@@ -43,6 +51,34 @@ export function Workspace({ document, updateDocument, onError, onSelectionCountC
   const filteredIds = new Set(filteredTabs.map(({ id }) => id))
   const ungroupedTabs = filteredTabs.filter(({ groupId }) => groupId === undefined)
 
+
+  function moveDroppedTab(event: DragEvent<HTMLElement>, groupId?: string) {
+    event.preventDefault()
+    const payload = readTabDragPayload(event.dataTransfer)
+    setDropTarget(undefined)
+    if (!payload) return
+
+    void updateDocument((current) => moveTab(current, payload.tabId, activeSpaceId, groupId)).catch(
+      () => onError('TabSpace could not move that tab.'),
+    )
+  }
+
+  function createGroupFromDrop(event: DragEvent<HTMLElement>) {
+    event.preventDefault()
+    const payload = readTabDragPayload(event.dataTransfer)
+    setDropTarget(undefined)
+    if (!payload) return
+
+    void updateDocument((current) =>
+      createDefaultGroupForTab(current, activeSpaceId, payload.tabId),
+    ).catch(() => onError('TabSpace could not create a group for that tab.'))
+  }
+
+  function clearDropTarget(event: DragEvent<HTMLElement>) {
+    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+      setDropTarget(undefined)
+    }
+  }
 
   function editGroup(groupId: string, currentName: string, currentColor: string) {
     const name = window.prompt('Rename group:', currentName)?.trim()
@@ -129,8 +165,17 @@ export function Workspace({ document, updateDocument, onError, onSelectionCountC
             />
             {query ? <button className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-white" onClick={() => setQuery('')} aria-label="Clear search" type="button"><X className="size-3.5" /></button> : null}
           </label>
-          <button className="flex items-center gap-2 rounded-lg bg-violet-500 px-3 py-2 text-xs font-medium hover:bg-violet-400" onClick={() => setShowNewGroup(true)} type="button">
-            <Plus className="size-3.5" /> New group
+          <button
+            className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition ${dropTarget === 'new-group' ? 'border-violet-300 bg-violet-400 text-white ring-2 ring-violet-400/30' : 'border-violet-500 bg-violet-500 hover:bg-violet-400'}`}
+            onClick={() => setShowNewGroup(true)}
+            onDragEnter={(event) => { event.preventDefault(); setDropTarget('new-group') }}
+            onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = 'move' }}
+            onDragLeave={clearDropTarget}
+            onDrop={createGroupFromDrop}
+            title="Click to name a group, or drop a tab to create New Group"
+            type="button"
+          >
+            <Plus className="size-3.5" /> {dropTarget === 'new-group' ? 'Drop to create group' : 'New group'}
           </button>
         </div>
       </div>
@@ -157,7 +202,15 @@ export function Workspace({ document, updateDocument, onError, onSelectionCountC
             const tabs = document.tabs.filter((tab) => tab.groupId === group.id && filteredIds.has(tab.id))
             if (query && !tabs.length) return null
             return (
-              <section key={group.id} className="overflow-hidden rounded-2xl border border-white/8 bg-white/[0.018]">
+              <section
+                key={group.id}
+                className={`overflow-hidden rounded-2xl border bg-white/[0.018] transition ${dropTarget === `group:${group.id}` ? 'border-violet-400/70 bg-violet-400/8 ring-2 ring-violet-400/20' : 'border-white/8'}`}
+                aria-label={`${group.name} group drop area`}
+                onDragEnter={(event) => { event.preventDefault(); setDropTarget(`group:${group.id}`) }}
+                onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = 'move' }}
+                onDragLeave={clearDropTarget}
+                onDrop={(event) => moveDroppedTab(event, group.id)}
+              >
                 <div className="flex items-center gap-3 border-b border-white/7 px-4 py-3">
                   <button className="text-zinc-500 hover:text-white" onClick={() => void updateDocument((current) => updateGroup(current, group.id, { collapsed: !group.collapsed }))} aria-label={`${group.collapsed ? 'Expand' : 'Collapse'} ${group.name}`} type="button">{group.collapsed ? <ChevronRight className="size-4" /> : <ChevronDown className="size-4" />}</button>
                   <span className="size-2 rounded-full" style={{ backgroundColor: group.color }} />
@@ -174,7 +227,14 @@ export function Workspace({ document, updateDocument, onError, onSelectionCountC
           })}
 
           {(!query || ungroupedTabs.length) ? (
-            <section className="overflow-hidden rounded-2xl border border-white/8 bg-white/[0.012]">
+            <section
+              className={`overflow-hidden rounded-2xl border bg-white/[0.012] transition ${dropTarget === 'ungrouped' ? 'border-violet-400/70 bg-violet-400/8 ring-2 ring-violet-400/20' : 'border-white/8'}`}
+              aria-label="Ungrouped tabs drop area"
+              onDragEnter={(event) => { event.preventDefault(); setDropTarget('ungrouped') }}
+              onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = 'move' }}
+              onDragLeave={clearDropTarget}
+              onDrop={(event) => moveDroppedTab(event)}
+            >
               <div className="flex items-center gap-3 border-b border-white/7 px-4 py-3"><span className="size-2 rounded-full bg-zinc-700" /><h3 className="flex-1 text-sm font-medium text-zinc-300">Ungrouped</h3><span className="font-mono text-[10px] text-zinc-600">{ungroupedTabs.length}</span></div>
               {ungroupedTabs.length ? <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">{ungroupedTabs.map(card)}</div> : <div className="grid min-h-32 place-items-center p-4 text-center text-xs text-zinc-600"><span><Layers3 className="mx-auto mb-2 size-5 text-zinc-700" />No ungrouped tabs.</span></div>}
             </section>

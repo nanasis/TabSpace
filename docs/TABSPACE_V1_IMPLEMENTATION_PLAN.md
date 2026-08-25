@@ -343,6 +343,19 @@ A work item is not complete until all seven steps pass. Material design differen
 - `npm run build:site` produces the static `site-dist/` artifact with the `/TabSpace/` base path. Desktop and 390px mobile smoke checks passed in Microsoft Edge, and `docs/screenshots/website.png` captures the complete production page.
 - The GitHub Actions deployment completed after Pages was enabled. `https://nanasis.github.io/TabSpace/` returned HTTP 200 with the expected title; deployed desktop and mobile browser checks verified the hero, dashboard image asset, navigation, and absence of page errors.
 
+## Post-v1 interaction update
+
+- [x] Limit sidebar tab lists and counts to records currently connected to an open Chrome tab.
+- [x] Drag an open sidebar tab onto an existing workspace group.
+- [x] Drop an open tab onto **New group** to create a uniquely named default group and move the tab atomically.
+- [x] Drag tab cards between groups or back to Ungrouped.
+- [x] Show clear highlighted drop targets while preserving select-based keyboard movement.
+
+### Validation
+
+- `npm run validate` passes ESLint, TypeScript, 60 Vitest tests, extension and website builds, manifest reference verification, and Playwright E2E.
+- Component tests cover open-only sidebar rendering, sidebar-to-group dragging, and group-to-group card dragging. Domain tests cover default-group creation, collision-safe naming, and atomic tab movement.
+
 ## Completion checklist
 
 - [x] Every WI-01 through WI-22 is completed, reviewed, validated, committed, and pushed.

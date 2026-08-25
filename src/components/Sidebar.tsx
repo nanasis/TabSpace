@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 
 import type { TabSpaceDocument } from '../model/document'
 import { activateBrowserTab } from '../tabs/chromeTabs'
+import { writeTabDragPayload } from '../tabs/tabDrag'
 
 export interface SidebarProps {
   document?: TabSpaceDocument
@@ -16,7 +17,10 @@ export function Sidebar({ document, activeSpaceName, onActionError }: SidebarPro
   const [view, setView] = useState<TabView>('open')
   const activeSpaceId = document?.settings.activeSpaceId
   const spaceTabs = useMemo(
-    () => document?.tabs.filter(({ spaceId }) => spaceId === activeSpaceId) ?? [],
+    () =>
+      document?.tabs.filter(
+        ({ spaceId, chromeTabId }) => spaceId === activeSpaceId && chromeTabId !== undefined,
+      ) ?? [],
     [activeSpaceId, document?.tabs],
   )
   const visibleTabs = view === 'pinned' ? spaceTabs.filter(({ pinned }) => pinned) : spaceTabs
@@ -82,8 +86,13 @@ export function Sidebar({ document, activeSpaceName, onActionError }: SidebarPro
           {visibleTabs.map((tab) => (
             <button
               key={tab.id}
-              className={`flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left transition hover:bg-white/5 ${tab.active ? 'bg-violet-400/8 text-white' : 'text-zinc-400'}`}
+              className={`flex w-full cursor-grab items-center gap-2.5 rounded-lg px-2 py-2 text-left transition hover:bg-white/5 active:cursor-grabbing ${tab.active ? 'bg-violet-400/8 text-white' : 'text-zinc-400'}`}
               onClick={() => void activate(tab.chromeTabId)}
+              onDragStart={(event) =>
+                writeTabDragPayload(event.dataTransfer, { tabId: tab.id, source: 'sidebar' })
+              }
+              draggable
+              title="Drag to a group in the workspace"
               type="button"
             >
               <span className="grid size-7 shrink-0 place-items-center overflow-hidden rounded-lg bg-white/5 text-zinc-500">
@@ -109,7 +118,7 @@ export function Sidebar({ document, activeSpaceName, onActionError }: SidebarPro
 
       <div className="border-t border-white/8 p-4 font-mono text-[10px] text-zinc-600">
         {document
-          ? `${spaceTabs.length} tabs · ${document.groups.filter(({ spaceId }) => spaceId === activeSpaceId).length} groups · ${document.tabs.length} total`
+          ? `${spaceTabs.length} open tabs · ${document.groups.filter(({ spaceId }) => spaceId === activeSpaceId).length} groups · ${document.tabs.filter(({ chromeTabId }) => chromeTabId !== undefined).length} open total`
           : 'Loading local workspace…'}
       </div>
     </aside>

@@ -58,7 +58,7 @@ After changing source code, rebuild and select **Reload** on the TabSpace extens
 
 ### Spaces and groups
 
-New tabs enter the most recently active space as Ungrouped. Use the space toolbar to create or switch spaces and the **New group** control to organize tabs. Deleting a group moves its tabs to Ungrouped. Deleting a space keeps its Chrome tabs open and moves their records ungrouped to the first remaining space. The final space cannot be deleted.
+New tabs enter the most recently active space as Ungrouped. The sidebar lists only tabs that are currently open in Chrome. Drag an open sidebar tab onto a group, or onto **New group** to create a default group automatically. Tab cards can also be dragged between groups or back to Ungrouped. Use the space toolbar to create or switch spaces. Deleting a group moves its tabs to Ungrouped. Deleting a space keeps its Chrome tabs open and moves their records ungrouped to the first remaining space. The final space cannot be deleted.
 
 ### Search and tab actions
 

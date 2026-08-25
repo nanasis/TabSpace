@@ -1,5 +1,6 @@
 import { tabSpaceDocumentSchema, type TabSpaceDocument } from './document'
 import type { OperationOptions } from './spaceOperations'
+import { moveTab } from './tabOperations'
 
 function now(options: OperationOptions) {
   return (options.now ?? (() => new Date().toISOString()))()
@@ -23,6 +24,34 @@ export function createGroup(
     ],
     updatedAt,
   })
+}
+
+export function createDefaultGroupForTab(
+  document: TabSpaceDocument,
+  spaceId: string,
+  tabId: string,
+  options: OperationOptions = {},
+) {
+  if (!document.tabs.some(({ id }) => id === tabId)) return document
+
+  const existingNames = new Set(
+    document.groups
+      .filter((group) => group.spaceId === spaceId)
+      .map(({ name }) => name.toLocaleLowerCase()),
+  )
+  let suffix = 1
+  let name = 'New Group'
+  while (existingNames.has(name.toLocaleLowerCase())) {
+    suffix += 1
+    name = `New Group ${suffix}`
+  }
+
+  const created = createGroup(document, spaceId, name, '#8b5cf6', options)
+  const newGroup = created.groups.find(
+    (group) => group.spaceId === spaceId && !document.groups.some(({ id }) => id === group.id),
+  )
+  if (!newGroup) return document
+  return moveTab(created, tabId, spaceId, newGroup.id, now(options))
 }
 
 export function updateGroup(

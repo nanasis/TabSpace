@@ -9,6 +9,7 @@ import {
   openBrowserTab,
   setBrowserTabPinned,
 } from '../tabs/chromeTabs'
+import { writeTabDragPayload } from '../tabs/tabDrag'
 
 export interface TabCardProps {
   tab: TabRecord
@@ -89,7 +90,14 @@ export function TabCard({ tab, document, updateDocument, onError, selected, onSe
   }
 
   return (
-    <article className={`group relative min-w-0 rounded-xl border bg-[#15151b] ${compact ? 'p-2.5' : 'p-3.5'} transition hover:-translate-y-0.5 hover:border-white/16 hover:bg-[#181820] ${selected ? 'border-violet-400/60 ring-1 ring-violet-400/30' : tab.active ? 'border-violet-400/35 shadow-lg shadow-violet-950/10' : 'border-white/8'}`}>
+    <article
+      className={`group relative min-w-0 cursor-grab rounded-xl border bg-[#15151b] ${compact ? 'p-2.5' : 'p-3.5'} transition hover:-translate-y-0.5 hover:border-white/16 hover:bg-[#181820] active:cursor-grabbing ${selected ? 'border-violet-400/60 ring-1 ring-violet-400/30' : tab.active ? 'border-violet-400/35 shadow-lg shadow-violet-950/10' : 'border-white/8'}`}
+      draggable
+      onDragStart={(event) =>
+        writeTabDragPayload(event.dataTransfer, { tabId: tab.id, source: 'card' })
+      }
+      title="Drag this card to another group"
+    >
       {onSelect ? (
         <button
           className={`absolute -left-2 -top-2 z-10 grid size-5 place-items-center rounded-md border transition ${selected ? 'border-violet-400 bg-violet-500 text-white' : 'border-white/15 bg-[#1b1b23] text-transparent opacity-0 group-hover:opacity-100 focus:opacity-100'}`}
