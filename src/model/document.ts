@@ -56,6 +56,7 @@ export const tabRecordSchema = z
 export const settingsSchema = z
   .object({
     activeSpaceId: idSchema,
+    cardDensity: z.enum(['comfortable', 'compact']).default('comfortable'),
   })
   .strict()
 

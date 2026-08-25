@@ -17,6 +17,7 @@ export interface TabCardProps {
   onError(message: string): void
   selected?: boolean
   onSelect?(event: MouseEvent<HTMLButtonElement>): void
+  compact?: boolean
 }
 
 function domainFor(url: string) {
@@ -38,7 +39,7 @@ function relativeAccess(timestamp: string) {
   return `${Math.floor(hours / 24)}d ago`
 }
 
-export function TabCard({ tab, document, updateDocument, onError, selected, onSelect }: TabCardProps) {
+export function TabCard({ tab, document, updateDocument, onError, selected, onSelect, compact }: TabCardProps) {
   async function open() {
     try {
       if (tab.chromeTabId === undefined) await openBrowserTab(tab.url)
@@ -88,7 +89,7 @@ export function TabCard({ tab, document, updateDocument, onError, selected, onSe
   }
 
   return (
-    <article className={`group relative min-w-0 rounded-xl border bg-[#15151b] p-3.5 transition hover:-translate-y-0.5 hover:border-white/16 hover:bg-[#181820] ${selected ? 'border-violet-400/60 ring-1 ring-violet-400/30' : tab.active ? 'border-violet-400/35 shadow-lg shadow-violet-950/10' : 'border-white/8'}`}>
+    <article className={`group relative min-w-0 rounded-xl border bg-[#15151b] ${compact ? 'p-2.5' : 'p-3.5'} transition hover:-translate-y-0.5 hover:border-white/16 hover:bg-[#181820] ${selected ? 'border-violet-400/60 ring-1 ring-violet-400/30' : tab.active ? 'border-violet-400/35 shadow-lg shadow-violet-950/10' : 'border-white/8'}`}>
       {onSelect ? (
         <button
           className={`absolute -left-2 -top-2 z-10 grid size-5 place-items-center rounded-md border transition ${selected ? 'border-violet-400 bg-violet-500 text-white' : 'border-white/15 bg-[#1b1b23] text-transparent opacity-0 group-hover:opacity-100 focus:opacity-100'}`}

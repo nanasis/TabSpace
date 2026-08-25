@@ -102,6 +102,7 @@ export function Workspace({ document, updateDocument, onError, onSelectionCountC
         onError={onError}
         selected={selectedIds.has(tab.id)}
         onSelect={(event) => selectTab(tab.id, event)}
+        compact={document.settings.cardDensity === 'compact'}
       />
     )
   }

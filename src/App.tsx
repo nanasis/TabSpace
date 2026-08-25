@@ -1,10 +1,12 @@
-import { PanelLeft, Search, Settings2 } from 'lucide-react'
+import { Settings2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { useTabSpaceDocument } from './app/useTabSpaceDocument'
+import { SettingsDialog } from './components/SettingsDialog'
 import { Sidebar } from './components/Sidebar'
 import { SpaceBar } from './components/SpaceBar'
 import { Workspace } from './components/Workspace'
+import { updateSettings } from './model/settingsOperations'
 import {
   createChromeDocumentRepository,
   type DocumentRepository,
@@ -22,6 +24,7 @@ export function App({ repository }: AppProps) {
   const { document, error, loading, updateDocument } = useTabSpaceDocument(documentRepository)
   const [actionError, setActionError] = useState<string>()
   const [selection, setSelection] = useState({ spaceId: '', count: 0 })
+  const [settingsOpen, setSettingsOpen] = useState(false)
   const activeSpace = document?.spaces.find(({ id }) => id === document.settings.activeSpaceId)
 
   return (
@@ -34,13 +37,6 @@ export function App({ repository }: AppProps) {
 
       <div className="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-72">
         <header className="sticky top-0 z-10 flex h-18 items-center gap-3 border-b border-white/8 bg-[#0b0b0f]/90 px-4 backdrop-blur-xl sm:px-7">
-          <button
-            className="grid size-9 place-items-center rounded-lg border border-white/10 text-zinc-400 lg:hidden"
-            aria-label="Open navigation"
-            type="button"
-          >
-            <PanelLeft className="size-4" />
-          </button>
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-medium">
               {activeSpace ? `${activeSpace.emoji} ${activeSpace.name}` : 'TabSpace'}
@@ -51,14 +47,9 @@ export function App({ repository }: AppProps) {
           </div>
           <button
             className="grid size-9 place-items-center rounded-lg border border-white/10 text-zinc-400 transition hover:border-white/20 hover:text-white"
-            aria-label="Search tabs"
-            type="button"
-          >
-            <Search className="size-4" />
-          </button>
-          <button
-            className="grid size-9 place-items-center rounded-lg border border-white/10 text-zinc-400 transition hover:border-white/20 hover:text-white"
             aria-label="Settings"
+            aria-haspopup="dialog"
+            onClick={() => setSettingsOpen(true)}
             type="button"
           >
             <Settings2 className="size-4" />
@@ -108,6 +99,14 @@ export function App({ repository }: AppProps) {
           <span>Local · private</span>
         </footer>
       </div>
+
+      {settingsOpen && document ? (
+        <SettingsDialog
+          document={document}
+          onChange={(updates) => void updateDocument((current) => updateSettings(current, updates))}
+          onClose={() => setSettingsOpen(false)}
+        />
+      ) : null}
     </div>
   )
 }

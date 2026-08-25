@@ -195,11 +195,16 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-12 — Implement persistent organization and reconciliation
 
-- [ ] Persist spaces, groups, aliases, avatars, assignments, and settings.
-- [ ] Restore the last active space.
-- [ ] Reconcile stored records with open Chrome tabs without duplicates.
+- [x] Persist spaces, groups, aliases, avatars, assignments, and settings.
+- [x] Restore the last active space.
+- [x] Reconcile stored records with open Chrome tabs without duplicates.
 - [ ] Debounce writes and recover from invalid/outdated storage.
-- [ ] Start from a safe default state without fixed Figma sample data.
+- [x] Start from a safe default state without fixed Figma sample data.
+
+#### Validation in progress
+
+- The settings control now opens a keyboard-dismissible dialog and persists comfortable or compact card density. The component test verifies opening the dialog and saving the selected setting.
+- Full invalid-storage recovery remains before WI-12 can be completed.
 
 ### WI-13 — Implement provider-selected JSON import
 

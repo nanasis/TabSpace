@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
 import { App } from './App'
@@ -23,5 +24,22 @@ describe('App', () => {
 
     expect(screen.getByRole('heading', { name: 'TabSpace' })).toBeInTheDocument()
     expect(await screen.findByRole('heading', { name: 'My Space' })).toBeInTheDocument()
+  })
+
+  it('opens settings and persists card density', async () => {
+    const user = userEvent.setup()
+    const repository = createRepository()
+    render(<App repository={repository} />)
+    await screen.findByRole('heading', { name: 'My Space' })
+
+    await user.click(screen.getByRole('button', { name: 'Settings' }))
+    expect(screen.getByRole('dialog', { name: 'Settings' })).toBeInTheDocument()
+    await user.click(screen.getByRole('radio', { name: 'compact' }))
+
+    await waitFor(() =>
+      expect(repository.save).toHaveBeenCalledWith(
+        expect.objectContaining({ settings: expect.objectContaining({ cardDensity: 'compact' }) }),
+      ),
+    )
   })
 })
