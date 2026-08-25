@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="TabSpace">
+  <defs>
+    <linearGradient id="background" x1="20" y1="12" x2="108" y2="116" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8b5cf6"/>
+      <stop offset="1" stop-color="#5b3fc4"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="28" fill="#11101d"/>
+  <path d="M39 28h57a12 12 0 0 1 12 12v35a12 12 0 0 1-12 12H39a12 12 0 0 1-12-12V40a12 12 0 0 1 12-12Z" fill="#413666"/>
+  <path d="M31 40h57a12 12 0 0 1 12 12v35a12 12 0 0 1-12 12H31a12 12 0 0 1-12-12V52a12 12 0 0 1 12-12Z" fill="#6851b7"/>
+  <path d="M25 53h57a12 12 0 0 1 12 12v35a12 12 0 0 1-12 12H25a12 12 0 0 1-12-12V65a12 12 0 0 1 12-12Z" fill="url(#background)"/>
+  <circle cx="40" cy="69" r="5" fill="#ddd6fe"/>
+  <path d="M52 69h25" stroke="#f5f3ff" stroke-width="7" stroke-linecap="round"/>
+  <path d="M39 86h38" stroke="#c4b5fd" stroke-width="7" stroke-linecap="round"/>
+</svg>

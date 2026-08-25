@@ -72,12 +72,18 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-03 — Configure Manifest V3 and extension runtime
 
-- [ ] Add extension metadata and icons.
-- [ ] Add the dashboard extension page.
-- [ ] Make the toolbar action open or focus the dashboard.
-- [ ] Add only required Chrome permissions and GitHub host permissions.
-- [ ] Implement the background service worker.
-- [ ] Handle installation and extension upgrades safely.
+- [x] Add extension metadata and icons.
+- [x] Add the dashboard extension page.
+- [x] Make the toolbar action open or focus the dashboard.
+- [x] Add only required Chrome permissions and GitHub host permissions.
+- [x] Implement the background service worker.
+- [x] Handle installation and extension upgrades safely.
+
+#### Validation
+
+- `npm run validate` passed on 2026-08-25: ESLint, TypeScript, Vitest (5 tests), the multi-entry Vite production build, and unpacked-extension reference verification.
+- Dashboard runtime tests cover opening, focusing an existing dashboard across windows, stale-tab recovery, and tab-query failure recovery.
+- The install lifecycle opens the dashboard only for a first install; updates preserve the current browser state without automatically opening a page.
 
 ### WI-04 — Define the persistent data model
 
