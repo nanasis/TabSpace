@@ -101,11 +101,17 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-05 — Integrate real Chrome tabs
 
-- [ ] Query current tabs and reconcile them with stored organization.
-- [ ] Listen for tab creation, update, activation, replacement, movement, and removal.
-- [ ] Activate/focus, close, and pin/unpin tabs with Chrome APIs.
-- [ ] Handle restricted URLs, stale IDs, restored tabs, and API failures.
-- [ ] Avoid duplicate records and unnecessary storage writes.
+- [x] Query current tabs and reconcile them with stored organization.
+- [x] Listen for tab creation, update, activation, replacement, movement, and removal.
+- [x] Activate/focus, close, and pin/unpin tabs with Chrome APIs.
+- [x] Handle restricted URLs, stale IDs, restored tabs, and API failures.
+- [x] Avoid duplicate records and unnecessary storage writes.
+
+#### Validation
+
+- `npm run validate` passed on 2026-08-25: ESLint, TypeScript, 23 Vitest tests, production build, and unpacked-extension verification.
+- Reconciliation tests cover discovery, dashboard exclusion, metadata updates that preserve organization, closed and saved records, no-op writes, Chrome tab replacement, and activation timestamps.
+- Browser events are debounced and serialized; API action errors are exposed without including tab URLs or titles.
 
 ### WI-06 — Reproduce the Figma application shell
 
