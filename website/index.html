@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="TabSpace is a private, focused Chrome tab manager with spaces, groups, portable backups, and optional private Gist sync." />
+    <meta name="theme-color" content="#0b0b0f" />
+    <meta property="og:title" content="TabSpace — Your tabs, finally in place" />
+    <meta property="og:description" content="Organize Chrome tabs into focused spaces and groups without giving up local control." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://nanasis.github.io/TabSpace/dashboard.png" />
+    <meta property="og:url" content="https://nanasis.github.io/TabSpace/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" type="image/png" href="./favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./styles.css" />
+    <title>TabSpace — Your tabs, finally in place</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="TabSpace home"><img src="./favicon.png" alt="" /><span>TabSpace</span><small>v1</small></a>
+      <nav aria-label="Main navigation"><a href="#features">Features</a><a href="#privacy">Privacy</a><a href="#install">Install</a><a class="nav-cta" href="https://github.com/nanasis/TabSpace">GitHub</a></nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="glow glow-one"></div><div class="glow glow-two"></div>
+        <div class="hero-copy">
+          <p class="eyebrow">Chrome tabs · organized locally</p>
+          <h1>Your tabs,<br /><span>finally in place.</span></h1>
+          <p class="hero-lead">Turn tab overload into focused spaces and groups. Search, move, back up, and sync on your terms.</p>
+          <div class="hero-actions"><a class="button primary" href="#install">Install locally</a><a class="button secondary" href="https://github.com/nanasis/TabSpace">View source <span aria-hidden="true">↗</span></a></div>
+          <ul class="trust-list" aria-label="Key qualities"><li>Manifest V3</li><li>Local-first</li><li>Open source</li></ul>
+        </div>
+        <div class="hero-visual"><div class="window-bar"><i></i><i></i><i></i><span>TabSpace dashboard</span></div><img src="./dashboard.png" alt="TabSpace dashboard showing spaces, groups, and tab cards" /></div>
+      </section>
+
+      <section class="stats" aria-label="Project highlights"><div><strong>1</strong><span>focused dashboard</span></div><div><strong>4</strong><span>portable export formats</span></div><div><strong>0</strong><span>embedded credentials</span></div><div><strong>100%</strong><span>local by default</span></div></section>
+
+      <section id="features" class="section">
+        <div class="section-heading"><p class="eyebrow">A calmer browser</p><h2>Everything needed to keep context.</h2><p>TabSpace combines real browser controls with persistent organization—without turning your workflow into another cloud account.</p></div>
+        <div class="feature-grid">
+          <article class="feature featured"><span class="icon">⌘</span><h3>Spaces that match your work</h3><p>Create separate contexts for projects, research, and life. New tabs follow your active space and remain easy to organize.</p><div class="mini-spaces"><span>💼 Work</span><span>🔬 Research</span><span>🌿 Personal</span></div></article>
+          <article class="feature"><span class="icon">⌕</span><h3>Find any tab fast</h3><p>Search aliases, titles, domains, and URLs instantly.</p></article>
+          <article class="feature"><span class="icon">☷</span><h3>Bulk organization</h3><p>Use familiar modifier selection and move many tabs together.</p></article>
+          <article class="feature"><span class="icon">⇄</span><h3>Portable by design</h3><p>Import Toby, Tabme, or TabSpace JSON. Export JSON, HTML, OneTab text, or Markdown.</p></article>
+          <article class="feature"><span class="icon">☁</span><h3>Optional private sync</h3><p>Push and pull a canonical backup through your own private GitHub Gist.</p></article>
+        </div>
+      </section>
+
+      <section class="workflow section">
+        <div class="section-heading"><p class="eyebrow">Simple workflow</p><h2>From tab chaos to clarity.</h2></div>
+        <ol><li><span>01</span><div><h3>Open the dashboard</h3><p>The toolbar action opens or focuses one full TabSpace page.</p></div></li><li><span>02</span><div><h3>Create your spaces</h3><p>Name, color, order, and switch between durable contexts.</p></div></li><li><span>03</span><div><h3>Group and act</h3><p>Search, pin, alias, select, and move live tabs without leaving the dashboard.</p></div></li><li><span>04</span><div><h3>Back up your way</h3><p>Download a portable backup or explicitly sync to a private Gist.</p></div></li></ol>
+      </section>
+
+      <section id="privacy" class="privacy section">
+        <div><p class="eyebrow">Privacy & security</p><h2>Your browsing context belongs to you.</h2><p>Organization stays in Chrome local storage unless you explicitly export it or enable Gist synchronization. Tokens live only in session storage and never enter backups.</p><a href="https://github.com/nanasis/TabSpace#data-safety">Read the data-safety notes →</a></div>
+        <ul><li><strong>No page injection</strong><span>TabSpace never runs scripts inside websites.</span></li><li><strong>No history permission</strong><span>Only current tab metadata is requested.</span></li><li><strong>Strict backups</strong><span>Runtime IDs, tokens, and sync metadata are excluded.</span></li><li><strong>Conflict-aware sync</strong><span>Remote revisions protect changed Gists.</span></li></ul>
+      </section>
+
+      <section id="install" class="install section">
+        <div class="section-heading"><p class="eyebrow">Try TabSpace</p><h2>Install the development build.</h2><p>The first release is available as an unpacked Chrome extension while store distribution is prepared.</p></div>
+        <div class="terminal" aria-label="Installation commands"><div><i></i><i></i><i></i><span>terminal</span></div><pre><code><b>$</b> git clone https://github.com/nanasis/TabSpace.git
+<b>$</b> cd TabSpace
+<b>$</b> npm install
+<b>$</b> npm run build</code></pre></div>
+        <p class="install-note">Then open <code>chrome://extensions</code>, enable Developer mode, choose <strong>Load unpacked</strong>, and select <code>dist/</code>.</p>
+        <a class="button primary" href="https://github.com/nanasis/TabSpace">Get the source on GitHub</a>
+      </section>
+    </main>
+
+    <footer><a class="brand" href="#top"><img src="./favicon.png" alt="" /><span>TabSpace</span></a><p>Focused tabs. Local control.</p><div><a href="https://github.com/nanasis/TabSpace">Repository</a><a href="https://github.com/nanasis/TabSpace/issues">Issues</a><a href="https://github.com/nanasis/TabSpace/blob/main/LICENSE">MIT License</a></div></footer>
+  </body>
+</html>

@@ -330,13 +330,18 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-22 — Build and deploy the GitHub Pages website
 
-- [ ] Create a modern responsive project website consistent with the TabSpace visual identity.
-- [ ] Include hero, feature overview, workflow, design screenshots, privacy/security, installation, and repository links.
-- [ ] Add accessible navigation, responsive layouts, metadata, social preview, and favicon.
-- [ ] Build the static website with the repository toolchain.
-- [ ] Add a GitHub Actions workflow that validates and deploys the site to GitHub Pages.
-- [ ] Document Pages repository settings and deployment behavior.
+- [x] Create a modern responsive project website consistent with the TabSpace visual identity.
+- [x] Include hero, feature overview, workflow, design screenshots, privacy/security, installation, and repository links.
+- [x] Add accessible navigation, responsive layouts, metadata, social preview, and favicon.
+- [x] Build the static website with the repository toolchain.
+- [x] Add a GitHub Actions workflow that validates and deploys the site to GitHub Pages.
+- [x] Document Pages repository settings and deployment behavior.
 - [ ] Verify the production build and deployed URL.
+
+#### Validation in progress
+
+- `npm run build:site` produces the static `site-dist/` artifact with the `/TabSpace/` base path. Desktop and 390px mobile smoke checks passed in Microsoft Edge, and `docs/screenshots/website.png` captures the complete production page.
+- Deployment verification will be recorded after the Pages workflow runs on the site commit.
 
 ## Completion checklist
 
