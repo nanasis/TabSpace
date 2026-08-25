@@ -65,7 +65,7 @@ test.beforeEach(async ({ page }) => {
 test('opens settings, persists density, and previews a backup import', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { name: 'My Space' })).toBeVisible()
-  await page.screenshot({ path: 'docs/screenshots/dashboard.png', fullPage: true })
+  await page.screenshot({ path: 'test-results/dashboard.png', fullPage: true })
 
   await page.getByRole('button', { name: 'Settings' }).click()
   await expect(page.getByRole('dialog', { name: 'Settings' })).toBeVisible()
