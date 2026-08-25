@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { createDefaultDocument } from '../model/document'
 import {
   createDocumentRepository,
+  DOCUMENT_RECOVERY_KEY,
   DOCUMENT_STORAGE_KEY,
   type LocalStorageArea,
   StoredDocumentError,
@@ -66,6 +67,26 @@ describe('document repository', () => {
     await expect(createRepository(storage).load()).rejects.toBeInstanceOf(StoredDocumentError)
     expect(items[DOCUMENT_STORAGE_KEY]).toBe(corruptDocument)
     expect(storage.set).not.toHaveBeenCalled()
+  })
+
+  it('recovers invalid storage without retaining untrusted contents', async () => {
+    const { items, storage } = createStorage({
+      [DOCUMENT_STORAGE_KEY]: { schemaVersion: 1, token: 'must-not-survive' },
+    })
+    const repository = createDocumentRepository(storage, {
+      now: () => NOW,
+      createId: () => 'recovered-space',
+      recoverInvalid: true,
+    })
+
+    const document = await repository.load()
+
+    expect(document.spaces[0]?.id).toBe('recovered-space')
+    expect(items[DOCUMENT_STORAGE_KEY]).toEqual(document)
+    expect(items[DOCUMENT_RECOVERY_KEY]).toEqual(
+      expect.objectContaining({ reason: 'invalid-document' }),
+    )
+    expect(JSON.stringify(items)).not.toContain('must-not-survive')
   })
 
   it('validates documents before saving', async () => {

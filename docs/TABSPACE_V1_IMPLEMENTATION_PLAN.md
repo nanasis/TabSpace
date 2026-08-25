@@ -198,13 +198,13 @@ A work item is not complete until all seven steps pass. Material design differen
 - [x] Persist spaces, groups, aliases, avatars, assignments, and settings.
 - [x] Restore the last active space.
 - [x] Reconcile stored records with open Chrome tabs without duplicates.
-- [ ] Debounce writes and recover from invalid/outdated storage.
+- [x] Debounce writes and recover from invalid/outdated storage.
 - [x] Start from a safe default state without fixed Figma sample data.
 
-#### Validation in progress
+#### Validation
 
-- The settings control now opens a keyboard-dismissible dialog and persists comfortable or compact card density. The component test verifies opening the dialog and saving the selected setting.
-- Full invalid-storage recovery remains before WI-12 can be completed.
+- The settings control opens a keyboard-dismissible dialog and persists comfortable or compact card density. The component test verifies opening the dialog and saving the selected setting.
+- Browser event writes are debounced and serialized. Outdated documents migrate in place; invalid documents recover to a safe default while retaining only non-sensitive recovery metadata.
 
 ### WI-13 — Implement provider-selected JSON import
 

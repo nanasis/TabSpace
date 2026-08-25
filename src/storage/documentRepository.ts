@@ -7,6 +7,7 @@ import {
 } from '../model/document'
 
 export const DOCUMENT_STORAGE_KEY = 'tabspace.document'
+export const DOCUMENT_RECOVERY_KEY = 'tabspace.recovery'
 
 export interface LocalStorageArea {
   get(key: string): Promise<Record<string, unknown>>
@@ -20,6 +21,7 @@ export interface DocumentRepository {
 
 export interface DocumentRepositoryOptions extends DocumentFactoryOptions {
   storageKey?: string
+  recoverInvalid?: boolean
 }
 
 export class StoredDocumentError extends Error {
@@ -53,7 +55,19 @@ export function createDocumentRepository(
         }
         return result.document
       } catch (error) {
-        throw new StoredDocumentError('The stored TabSpace document is invalid', { cause: error })
+        if (!options.recoverInvalid) {
+          throw new StoredDocumentError('The stored TabSpace document is invalid', { cause: error })
+        }
+
+        const recoveredDocument = createDefaultDocument(options)
+        await storage.set({
+          [storageKey]: recoveredDocument,
+          [DOCUMENT_RECOVERY_KEY]: {
+            recoveredAt: new Date().toISOString(),
+            reason: 'invalid-document',
+          },
+        })
+        return recoveredDocument
       }
     },
 
@@ -70,6 +84,6 @@ export function createChromeDocumentRepository(options: DocumentRepositoryOption
       get: (key) => chrome.storage.local.get(key),
       set: (items) => chrome.storage.local.set(items),
     },
-    options,
+    { recoverInvalid: true, ...options },
   )
 }
