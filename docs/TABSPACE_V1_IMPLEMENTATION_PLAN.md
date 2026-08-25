@@ -316,12 +316,17 @@ A work item is not complete until all seven steps pass. Material design differen
 
 ### WI-21 — Documentation and extension release readiness
 
-- [ ] Document setup, development, validation, build, and unpacked installation.
-- [ ] Document permissions, spaces, groups, search, actions, import, export, backup, and restore.
-- [ ] Document Toby/Tabme fixture expectations and provider selection.
-- [ ] Document GitHub sync privacy/security and known limitations.
-- [ ] Add release icons and metadata.
-- [ ] Pass clean-install and packaged-extension smoke tests.
+- [x] Document setup, development, validation, build, and unpacked installation.
+- [x] Document permissions, spaces, groups, search, actions, import, export, backup, and restore.
+- [x] Document Toby/Tabme fixture expectations and provider selection.
+- [x] Document GitHub sync privacy/security and known limitations.
+- [x] Add release icons and metadata.
+- [x] Pass clean-install and packaged-extension smoke tests.
+
+#### Validation
+
+- A clean `npm ci --ignore-scripts` completed with no audit findings.
+- `npm run package` generated `release/tabspace-v0.1.0.zip`; `unzip -t` verified every entry and confirmed the manifest, dashboard, and background worker at the package root structure expected by Chrome.
 
 ### WI-22 — Build and deploy the GitHub Pages website
 
