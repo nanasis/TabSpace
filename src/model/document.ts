@@ -45,6 +45,7 @@ export const tabRecordSchema = z
     faviconUrl: z.string().max(8192).optional(),
     alias: z.string().trim().min(1).max(512).optional(),
     avatarEmoji: z.string().trim().min(1).max(16).optional(),
+    avatarImage: z.string().startsWith('data:image/').max(262144).optional(),
     pinned: z.boolean(),
     active: z.boolean().default(false),
     order: orderSchema,

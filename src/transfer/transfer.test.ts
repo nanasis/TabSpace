@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { createDefaultDocument, tabSpaceDocumentSchema } from '../model/document'
+import { updateTab } from '../model/tabOperations'
 import { applyImport } from './applyImport'
 import { createBookmarksHtml, createMarkdown, createOneTabText } from './exports'
 import { parseImport } from './importers'
@@ -116,12 +117,25 @@ describe('provider imports', () => {
 
 describe('backup and compatible exports', () => {
   it('round trips a canonical backup without runtime IDs or sync secrets', () => {
-    const document = createDefaultDocument({ now: () => NOW, createId: () => 'space-1' })
+    const initial = createDefaultDocument({ now: () => NOW, createId: () => 'space-1' })
+    const imported = applyImport(initial, parseImport('toby', {
+      lists: [{ title: 'Docs', cards: [{ title: 'Example', url: 'https://example.com' }] }],
+    }), 'replace', { now: () => NOW, createId: ids() })
+    const document = updateTab(imported, imported.tabs[0]?.id ?? '', {
+      alias: 'Reference',
+      avatarImage: 'data:image/png;base64,AA==',
+    }, NOW)
     const backup = createBackup(document, NOW)
     const parsed = parseImport('tabspace', backup)
 
     expect(backupSchema.parse(backup)).toEqual(backup)
-    expect(parsed.spaces[0]?.name).toBe('My Space')
+    expect(parsed.spaces[0]?.name).toBe('Toby Import')
+    expect(parsed.spaces[0]?.groups[0]?.tabs[0]).toEqual(
+      expect.objectContaining({
+        alias: 'Reference',
+        avatarImage: 'data:image/png;base64,AA==',
+      }),
+    )
     expect(JSON.stringify(backup)).not.toContain('chromeTabId')
     expect(JSON.stringify(backup)).not.toContain('sync')
   })

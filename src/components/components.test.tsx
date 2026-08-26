@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -141,7 +141,7 @@ describe('workspace components', () => {
     expect(screen.getByText('Example')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Edit Example' })).toHaveAttribute(
       'title',
-      'Edit the tab alias',
+      'Edit the tab alias and icon',
     )
     expect(screen.getByRole('button', { name: 'Pin tab' })).toHaveAttribute(
       'title',
@@ -158,6 +158,42 @@ describe('workspace components', () => {
 
     await user.type(screen.getByRole('textbox', { name: 'Search tabs' }), 'missing')
     expect(screen.getByText(/No tabs match/)).toBeInTheDocument()
+  })
+
+  it('edits the alias and supports default or uploaded card icons', async () => {
+    const user = userEvent.setup()
+    let id = 0
+    const document = applyImport(
+      initialDocument(),
+      parseImport('toby', {
+        lists: [{ title: 'Sources', cards: [{ title: 'Example', url: 'https://example.com' }] }],
+      }),
+      'replace',
+      { now: () => NOW, createId: () => `edit-${++id}` },
+    )
+    const updateDocument = vi.fn().mockResolvedValue(undefined)
+    render(<Workspace document={document} updateDocument={updateDocument} onError={vi.fn()} />)
+
+    await user.click(screen.getByRole('button', { name: 'Edit Example' }))
+    expect(screen.getByRole('dialog', { name: 'Edit tab card' })).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Default/ })).toBeChecked()
+
+    await user.click(screen.getByRole('radio', { name: /Upload/ }))
+    const image = new File(['small-icon'], 'icon.png', { type: 'image/png' })
+    await user.upload(screen.getByLabelText('Upload icon'), image)
+    await screen.findByAltText('Uploaded icon preview')
+    await user.clear(screen.getByRole('textbox', { name: 'Display alias' }))
+    await user.type(screen.getByRole('textbox', { name: 'Display alias' }), 'Custom alias')
+    await user.click(screen.getByRole('button', { name: 'Save changes' }))
+
+    await waitFor(() => expect(updateDocument).toHaveBeenCalledOnce())
+    const transform = updateDocument.mock.calls[0]?.[0] as (
+      value: typeof document,
+    ) => typeof document
+    const edited = transform(document).tabs[0]
+    expect(edited?.alias).toBe('Custom alias')
+    expect(edited?.avatarImage).toMatch(/^data:image\/png;base64,/)
+    expect(edited?.avatarEmoji).toBeUndefined()
   })
 
   it('uses a full-width auto-filling grid in dense mode', () => {

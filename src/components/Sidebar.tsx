@@ -97,7 +97,9 @@ export const Sidebar = memo(function Sidebar({ document, currentWindowId, onActi
               type="button"
             >
               <span className="grid size-7 shrink-0 place-items-center overflow-hidden rounded-lg bg-white/5 text-zinc-500">
-                {tab.avatarEmoji ? (
+                {tab.avatarImage ? (
+                  <img className="size-full object-cover" src={tab.avatarImage} alt="" loading="lazy" decoding="async" />
+                ) : tab.avatarEmoji ? (
                   <span className="text-sm">{tab.avatarEmoji}</span>
                 ) : tab.faviconUrl ? (
                   <img className="size-4" src={tab.faviconUrl} alt="" loading="lazy" decoding="async" />

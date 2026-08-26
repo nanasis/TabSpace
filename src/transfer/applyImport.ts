@@ -60,6 +60,7 @@ export function applyImport(
           title: tab.title.slice(0, 4096),
           ...(tab.alias ? { alias: tab.alias.slice(0, 512) } : {}),
           ...(tab.avatarEmoji ? { avatarEmoji: tab.avatarEmoji.slice(0, 16) } : {}),
+          ...(tab.avatarImage ? { avatarImage: tab.avatarImage.slice(0, 262144) } : {}),
           ...(faviconUrl ? { faviconUrl } : {}),
           pinned: false,
           active: false,

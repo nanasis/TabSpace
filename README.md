@@ -65,7 +65,7 @@ New tabs enter the most recently active space as Ungrouped. The sidebar lists ev
 
 ### Search, layout, and tab actions
 
-Search matches aliases, titles, domains, and URLs. Select a card title to activate/open the tab. The card footer provides Edit and Pin actions with hover descriptions; the top X on a grouped card removes it from that group and moves it to Ungrouped without closing the browser tab. Change the avatar from its icon, drag cards between groups, or use Ctrl/Cmd/Shift selection for bulk movement.
+Search matches aliases, titles, domains, and URLs. Select a card title to activate/open the tab. **Edit** opens a dashboard-styled editor for the alias and card icon: keep the default site icon, choose an emoji, or upload a local image up to 192 KB. Custom images remain in local storage and TabSpace backups. The card footer provides Edit and Pin actions with hover descriptions; the top X on a grouped card removes it from that group and moves it to Ungrouped without closing the browser tab. Change the avatar from its icon, drag cards between groups, or use Ctrl/Cmd/Shift selection for bulk movement.
 
 Under **Settings → Tab card density**, choose **Dense** to use the full GroupSpace width and dynamically fit more cards per row while preserving Compact card width, padding, and gaps. Choose **Compact** to retain the original bounded responsive layout. Existing `comfortable` settings are migrated to Compact automatically.
 

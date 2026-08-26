@@ -4,7 +4,12 @@ import { OrganizationError } from './spaceOperations'
 export function updateTab(
   document: TabSpaceDocument,
   tabId: string,
-  updates: { alias?: string; avatarEmoji?: string; pinned?: boolean },
+  updates: {
+    alias?: string
+    avatarEmoji?: string
+    avatarImage?: string
+    pinned?: boolean
+  },
   updatedAt = new Date().toISOString(),
 ) {
   return tabSpaceDocumentSchema.parse({

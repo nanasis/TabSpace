@@ -37,10 +37,15 @@ describe('tab operations', () => {
     const result = updateTab(populatedDocument(), 'tab-1', {
       alias: 'Reference',
       avatarEmoji: '📚',
+      avatarImage: 'data:image/png;base64,AA==',
     })
 
     expect(result.tabs[0]).toEqual(
-      expect.objectContaining({ alias: 'Reference', avatarEmoji: '📚' }),
+      expect.objectContaining({
+        alias: 'Reference',
+        avatarEmoji: '📚',
+        avatarImage: 'data:image/png;base64,AA==',
+      }),
     )
   })
 

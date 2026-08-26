@@ -1,5 +1,5 @@
 import { Check, Globe2, Pencil, Pin, PinOff, X } from 'lucide-react'
-import { memo, type MouseEvent } from 'react'
+import { memo, useState, type MouseEvent } from 'react'
 
 import type { TabRecord, TabSpaceDocument } from '../model/document'
 import { updateTab } from '../model/tabOperations'
@@ -9,6 +9,7 @@ import {
   setBrowserTabPinned,
 } from '../tabs/chromeTabs'
 import { writeTabDragPayload } from '../tabs/tabDrag'
+import { EditTabDialog, type EditTabValues } from './EditTabDialog'
 
 export interface TabCardProps {
   tab: TabRecord
@@ -48,6 +49,8 @@ export const TabCard = memo(function TabCard({
   onSelect,
   dense,
 }: TabCardProps) {
+  const [editing, setEditing] = useState(false)
+
   async function open() {
     try {
       if (tab.chromeTabId === undefined) await openBrowserTab(tab.url)
@@ -70,21 +73,15 @@ export const TabCard = memo(function TabCard({
     }
   }
 
-  function rename() {
-    const alias = window.prompt('Tab alias (leave blank to use its title):', tab.alias ?? '')
-    if (alias === null) return
-    void updateDocument((current) => updateTab(current, tab.id, { alias: alias.trim() || undefined }))
-  }
-
-  function chooseAvatar() {
-    const avatarEmoji = window.prompt('Custom emoji (leave blank to use the favicon):', tab.avatarEmoji ?? '')
-    if (avatarEmoji === null) return
-    void updateDocument((current) =>
-      updateTab(current, tab.id, { avatarEmoji: avatarEmoji.trim() || undefined }),
+  function saveEdits(values: EditTabValues) {
+    void updateDocument((current) => updateTab(current, tab.id, values)).catch(() =>
+      onError('TabSpace could not save the tab card changes.'),
     )
+    setEditing(false)
   }
 
   return (
+    <>
     <article
       className={`group relative min-w-0 cursor-grab rounded-xl border bg-[#15151b] p-3.5 transition hover:-translate-y-0.5 hover:border-white/16 hover:bg-[#181820] active:cursor-grabbing ${selected ? 'border-violet-400/60 ring-1 ring-violet-400/30' : tab.active ? 'border-violet-400/35 shadow-lg shadow-violet-950/10' : 'border-white/8'}`}
       data-density={dense ? 'dense' : 'compact'}
@@ -106,8 +103,8 @@ export const TabCard = memo(function TabCard({
         </button>
       ) : null}
       <div className="flex items-start gap-3">
-        <button className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-white/5" onClick={chooseAvatar} aria-label={`Change avatar for ${tab.alias ?? tab.title}`} title="Change the card avatar emoji" type="button">
-          {tab.avatarEmoji ? <span className="text-lg">{tab.avatarEmoji}</span> : tab.faviconUrl ? <img className="size-5" src={tab.faviconUrl} alt="" loading="lazy" decoding="async" /> : <Globe2 className="size-4 text-zinc-600" />}
+        <button className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-white/5" onClick={() => setEditing(true)} aria-label={`Edit icon for ${tab.alias ?? tab.title}`} title="Edit the card alias and icon" type="button">
+          {tab.avatarImage ? <img className="size-full object-cover" src={tab.avatarImage} alt="" loading="lazy" decoding="async" /> : tab.avatarEmoji ? <span className="text-lg">{tab.avatarEmoji}</span> : tab.faviconUrl ? <img className="size-5" src={tab.faviconUrl} alt="" loading="lazy" decoding="async" /> : <Globe2 className="size-4 text-zinc-600" />}
         </button>
         <button className="min-w-0 flex-1 text-left" onClick={() => void open()} title="Open or activate this tab" type="button">
           <span className="block truncate text-sm font-medium text-zinc-200">{tab.alias ?? tab.title}</span>
@@ -135,9 +132,9 @@ export const TabCard = memo(function TabCard({
       <div className="mt-3 flex items-center gap-1 border-t border-white/6 pt-3">
         <button
           className="icon-button"
-          onClick={rename}
+          onClick={() => setEditing(true)}
           aria-label={`Edit ${tab.alias ?? tab.title}`}
-          title="Edit the tab alias"
+          title="Edit the tab alias and icon"
           type="button"
         >
           <Pencil className="size-3" />
@@ -153,5 +150,13 @@ export const TabCard = memo(function TabCard({
         </button>
       </div>
     </article>
+    {editing ? (
+      <EditTabDialog
+        tab={tab}
+        onClose={() => setEditing(false)}
+        onSave={saveEdits}
+      />
+    ) : null}
+    </>
   )
 })

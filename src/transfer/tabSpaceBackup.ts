@@ -7,6 +7,7 @@ const backupTabSchema = z.object({
   url: z.string(),
   alias: z.string().optional(),
   avatarEmoji: z.string().optional(),
+  avatarImage: z.string().startsWith('data:image/').max(262144).optional(),
   faviconUrl: z.string().max(8192).optional(),
 }).strict()
 const backupGroupSchema = z.object({
@@ -37,6 +38,7 @@ function backupTab(tab: TabSpaceDocument['tabs'][number]) {
     url: tab.url,
     ...(tab.alias ? { alias: tab.alias } : {}),
     ...(tab.avatarEmoji ? { avatarEmoji: tab.avatarEmoji } : {}),
+    ...(tab.avatarImage ? { avatarImage: tab.avatarImage } : {}),
     ...(tab.faviconUrl ? { faviconUrl: tab.faviconUrl } : {}),
   }
 }
