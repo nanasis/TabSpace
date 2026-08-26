@@ -2,7 +2,7 @@
 
 TabSpace is a privacy-conscious Chrome extension for organizing open and saved tabs into persistent spaces and groups. It provides a full-page dashboard, real Chrome tab controls, portable backups, compatible exports, and optional private GitHub Gist synchronization.
 
-**Project website:** <https://nanasis.github.io/TabSpace/>
+**[Project website](https://nanasis.github.io/TabSpace/)** · **[Latest GitHub release](https://github.com/nanasis/TabSpace/releases/latest)** · **[Release notes](CHANGELOG.md)**
 
 ![TabSpace dashboard](docs/screenshots/dashboard.png)
 
@@ -19,7 +19,37 @@ TabSpace is a privacy-conscious Chrome extension for organizing open and saved t
 - Synchronize the canonical backup through a private GitHub Gist
 - Keep organization local by default in `chrome.storage.local`
 
-## Requirements
+## Install the GitHub release
+
+1. Open the [latest GitHub release](https://github.com/nanasis/TabSpace/releases/latest).
+2. Download `tabspace-v0.1.0.zip` from **Assets**.
+3. Extract the ZIP to a permanent folder. The selected folder must directly contain `manifest.json`.
+4. Open `chrome://extensions` in Chrome.
+5. Enable **Developer mode**.
+6. Select **Load unpacked** and choose the extracted folder.
+7. Open a new tab. TabSpace now provides Chrome's default new-tab page.
+
+Chrome does not automatically update unpacked extensions. For a future release, download and extract the new ZIP over the existing folder, then select **Reload** on the TabSpace card in `chrome://extensions`.
+
+The release also provides `tabspace-v0.1.0.zip.sha256`. Verify it with:
+
+```powershell
+Get-FileHash .\tabspace-v0.1.0.zip -Algorithm SHA256
+```
+
+or:
+
+```bash
+sha256sum tabspace-v0.1.0.zip
+```
+
+Compare the output with the checksum file before loading the extension.
+
+## Project website and documentation
+
+The GitHub Pages site is available at **<https://nanasis.github.io/TabSpace/>**. It provides the product overview, privacy model, installation summary, and links back to the repository and latest release.
+
+## Development requirements
 
 - Chrome with Manifest V3 support
 - Node.js 22.12 or newer
@@ -46,7 +76,7 @@ Available commands:
 | `npm run package` | Build and create `release/tabspace-v0.1.0.zip` |
 | `npm run validate` | Run lint, types, tests, build verification, and E2E |
 
-## Install locally in Chrome
+## Install a source build locally in Chrome
 
 1. Run `npm install` and `npm run build`.
 2. Open `chrome://extensions`.
