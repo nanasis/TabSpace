@@ -94,14 +94,19 @@ export function applyImport(
     let ungroupedOrder = tabs.filter(
       (tab) => tab.spaceId === firstImportedSpaceId && tab.groupId === undefined,
     ).length
+    const tabIds = new Set(tabs.map(({ id }) => id))
+    const importedIndexesByUrl = new Map<string, number[]>()
+    tabs.forEach((tab, index) => {
+      if (tab.chromeTabId !== undefined) return
+      const indexes = importedIndexesByUrl.get(canonicalUrl(tab.url))
+      if (indexes) indexes.push(index)
+      else importedIndexesByUrl.set(canonicalUrl(tab.url), [index])
+    })
 
     document.tabs
       .filter((tab): tab is TabRecord & { chromeTabId: number } => tab.chromeTabId !== undefined)
       .forEach((openTab) => {
-        const importedIndex = tabs.findIndex(
-          (tab) =>
-            tab.chromeTabId === undefined && canonicalUrl(tab.url) === canonicalUrl(openTab.url),
-        )
+        const importedIndex = importedIndexesByUrl.get(canonicalUrl(openTab.url))?.shift() ?? -1
 
         if (importedIndex >= 0) {
           const importedTab = tabs[importedIndex]
@@ -122,14 +127,16 @@ export function applyImport(
           return
         }
 
+        const nextTabId = tabIds.has(openTab.id) ? createId() : openTab.id
         tabs.push({
           ...openTab,
-          id: tabs.some(({ id }) => id === openTab.id) ? createId() : openTab.id,
+          id: nextTabId,
           spaceId: firstImportedSpaceId,
           groupId: undefined,
           order: ungroupedOrder,
           updatedAt,
         })
+        tabIds.add(nextTabId)
         ungroupedOrder += 1
       })
   }

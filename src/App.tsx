@@ -1,5 +1,5 @@
 import { Settings2 } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { useTabSpaceDocument } from './app/useTabSpaceDocument'
 import {
@@ -31,12 +31,17 @@ export function App({ repository }: AppProps) {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [transferView, setTransferView] = useState<DataTransferView>()
   const [currentWindowId, setCurrentWindowId] = useState<number>()
-  const activeSpace = document?.spaces.find(({ id }) => id === document.settings.activeSpaceId)
+  const activeSpaceId = document?.settings.activeSpaceId
+  const activeSpace = document?.spaces.find(({ id }) => id === activeSpaceId)
 
   useEffect(() => {
     if (typeof chrome === 'undefined' || !chrome.windows?.getCurrent) return
     void chrome.windows.getCurrent().then((window) => setCurrentWindowId(window.id))
   }, [])
+
+  const updateSelectionCount = useCallback((count: number) => {
+    if (activeSpaceId) setSelection({ spaceId: activeSpaceId, count })
+  }, [activeSpaceId])
 
   return (
     <div className="flex min-h-screen bg-[#0b0b0f] text-zinc-100">
@@ -94,9 +99,7 @@ export function App({ repository }: AppProps) {
                 document={document}
                 updateDocument={updateDocument}
                 onError={setActionError}
-                onSelectionCountChange={(count) =>
-                  setSelection({ spaceId: document.settings.activeSpaceId, count })
-                }
+                onSelectionCountChange={updateSelectionCount}
               />
             ) : (
               <p className="py-20 text-center text-sm text-zinc-600">Preparing your workspace…</p>

@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react'
+import { memo, useMemo } from 'react'
 
 import type { TabSpaceDocument } from '../model/document'
 import {
@@ -15,8 +16,21 @@ export interface SpaceBarProps {
   onError(message: string): void
 }
 
-export function SpaceBar({ document, updateDocument, onError }: SpaceBarProps) {
+export const SpaceBar = memo(function SpaceBar({ document, updateDocument, onError }: SpaceBarProps) {
   const activeSpace = document.spaces.find(({ id }) => id === document.settings.activeSpaceId)
+  const countsBySpace = useMemo(() => {
+    const counts = new Map<string, { tabs: number; groups: number }>()
+    document.spaces.forEach(({ id }) => counts.set(id, { tabs: 0, groups: 0 }))
+    document.tabs.forEach(({ spaceId }) => {
+      const countsForSpace = counts.get(spaceId)
+      if (countsForSpace) countsForSpace.tabs += 1
+    })
+    document.groups.forEach(({ spaceId }) => {
+      const countsForSpace = counts.get(spaceId)
+      if (countsForSpace) countsForSpace.groups += 1
+    })
+    return counts
+  }, [document.groups, document.spaces, document.tabs])
 
   function addSpace() {
     const name = window.prompt('Name your new space:', 'New Space')?.trim()
@@ -69,8 +83,7 @@ export function SpaceBar({ document, updateDocument, onError }: SpaceBarProps) {
               <span className="mr-1.5">{space.emoji}</span>
               {space.name}
               <span className="ml-2 font-mono text-[9px] text-zinc-500">
-                {document.tabs.filter(({ spaceId }) => spaceId === space.id).length}/
-                {document.groups.filter(({ spaceId }) => spaceId === space.id).length}
+                {countsBySpace.get(space.id)?.tabs ?? 0}/{countsBySpace.get(space.id)?.groups ?? 0}
               </span>
             </button>
           ))}
@@ -98,4 +111,4 @@ export function SpaceBar({ document, updateDocument, onError }: SpaceBarProps) {
       </div>
     </div>
   )
-}
+})

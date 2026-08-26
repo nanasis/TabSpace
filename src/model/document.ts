@@ -95,6 +95,7 @@ function addDocumentIntegrityIssues(
 ) {
   const spaceIds = new Set<string>()
   const groupIds = new Set<string>()
+  const groupsById = new Map<string, z.infer<typeof groupSchema>>()
   const tabIds = new Set<string>()
 
   document.spaces.forEach((space, index) => {
@@ -109,6 +110,7 @@ function addDocumentIntegrityIssues(
       context.addIssue({ code: 'custom', message: 'Group IDs must be unique', path: ['groups', index, 'id'] })
     }
     groupIds.add(group.id)
+    groupsById.set(group.id, group)
 
     if (!spaceIds.has(group.spaceId)) {
       context.addIssue({ code: 'custom', message: 'Group must reference an existing space', path: ['groups', index, 'spaceId'] })
@@ -126,7 +128,7 @@ function addDocumentIntegrityIssues(
     }
 
     if (tab.groupId) {
-      const group = document.groups.find(({ id }) => id === tab.groupId)
+      const group = groupsById.get(tab.groupId)
       if (!group || group.spaceId !== tab.spaceId) {
         context.addIssue({
           code: 'custom',

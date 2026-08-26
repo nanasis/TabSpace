@@ -9,7 +9,17 @@ import {
   Trash2,
   X,
 } from 'lucide-react'
-import { useMemo, useRef, useState, type DragEvent, type MouseEvent } from 'react'
+import {
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  memo,
+  useMemo,
+  useRef,
+  useState,
+  type DragEvent,
+  type MouseEvent,
+} from 'react'
 
 import type { TabRecord, TabSpaceDocument } from '../model/document'
 import {
@@ -19,11 +29,11 @@ import {
   moveGroup,
   updateGroup,
 } from '../model/groupOperations'
-import { moveTab } from '../model/tabOperations'
+import { moveTab, moveTabs } from '../model/tabOperations'
 import { searchTabs } from '../tabs/searchTabs'
 import { readTabDragPayload } from '../tabs/tabDrag'
 import { NewGroupDialog } from './NewGroupDialog'
-import { TabCard } from './TabCard'
+import { TabCard, type MoveDestination } from './TabCard'
 
 export interface WorkspaceProps {
   document: TabSpaceDocument
@@ -32,24 +42,65 @@ export interface WorkspaceProps {
   onSelectionCountChange?(count: number): void
 }
 
-export function Workspace({ document, updateDocument, onError, onSelectionCountChange }: WorkspaceProps) {
+export const Workspace = memo(function Workspace({
+  document,
+  updateDocument,
+  onError,
+  onSelectionCountChange,
+}: WorkspaceProps) {
   const [showNewGroup, setShowNewGroup] = useState(false)
   const [query, setQuery] = useState('')
+  const deferredQuery = useDeferredValue(query)
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [dropTarget, setDropTarget] = useState<string>()
   const activeSpaceId = document.settings.activeSpaceId
   const [destination, setDestination] = useState(`space:${activeSpaceId}`)
   const lastSelectedId = useRef<string | undefined>(undefined)
-  const groups = document.groups
-    .filter(({ spaceId }) => spaceId === activeSpaceId)
-    .sort((left, right) => left.order - right.order)
+  const filteredTabsRef = useRef<TabRecord[]>([])
+  const groups = useMemo(
+    () =>
+      document.groups
+        .filter(({ spaceId }) => spaceId === activeSpaceId)
+        .sort((left, right) => left.order - right.order),
+    [activeSpaceId, document.groups],
+  )
   const activeTabs = useMemo(
     () => document.tabs.filter(({ spaceId }) => spaceId === activeSpaceId),
     [activeSpaceId, document.tabs],
   )
-  const filteredTabs = useMemo(() => searchTabs(activeTabs, query), [activeTabs, query])
-  const filteredIds = new Set(filteredTabs.map(({ id }) => id))
-  const ungroupedTabs = filteredTabs.filter(({ groupId }) => groupId === undefined)
+  const filteredTabs = useMemo(
+    () => searchTabs(activeTabs, deferredQuery),
+    [activeTabs, deferredQuery],
+  )
+  useEffect(() => {
+    filteredTabsRef.current = filteredTabs
+  }, [filteredTabs])
+  const tabsByGroup = useMemo(() => {
+    const grouped = new Map<string | undefined, TabRecord[]>()
+    filteredTabs.forEach((tab) => {
+      const tabs = grouped.get(tab.groupId)
+      if (tabs) tabs.push(tab)
+      else grouped.set(tab.groupId, [tab])
+    })
+    return grouped
+  }, [filteredTabs])
+  const ungroupedTabs = tabsByGroup.get(undefined) ?? []
+  const moveDestinations = useMemo<MoveDestination[]>(() => {
+    const spaceNames = new Map(document.spaces.map(({ id, name }) => [id, name]))
+    return [
+      ...document.spaces.map((space) => ({
+        value: `space:${space.id}`,
+        label: `${space.name} / Ungrouped`,
+        spaceId: space.id,
+      })),
+      ...document.groups.map((group) => ({
+        value: `group:${group.id}`,
+        label: `${spaceNames.get(group.spaceId) ?? 'Space'} / ${group.name}`,
+        spaceId: group.spaceId,
+        groupId: group.id,
+      })),
+    ]
+  }, [document.groups, document.spaces])
   const dense = document.settings.cardDensity === 'dense'
   const cardGridClass = dense
     ? 'grid gap-2 p-3 [grid-template-columns:repeat(auto-fill,minmax(13rem,1fr))]'
@@ -96,51 +147,56 @@ export function Workspace({ document, updateDocument, onError, onSelectionCountC
     void updateDocument((current) => deleteGroup(current, groupId))
   }
 
-  function selectTab(tabId: string, event: MouseEvent<HTMLButtonElement>) {
-    const next = new Set(event.metaKey || event.ctrlKey || event.shiftKey ? selectedIds : [])
-    if (event.shiftKey && lastSelectedId.current) {
-      const first = filteredTabs.findIndex(({ id }) => id === lastSelectedId.current)
-      const last = filteredTabs.findIndex(({ id }) => id === tabId)
-      if (first >= 0 && last >= 0) {
-        filteredTabs
-          .slice(Math.min(first, last), Math.max(first, last) + 1)
-          .forEach(({ id }) => next.add(id))
+  const selectTab = useCallback((tabId: string, event: MouseEvent<HTMLButtonElement>) => {
+    setSelectedIds((current) => {
+      const next = new Set(event.metaKey || event.ctrlKey || event.shiftKey ? current : [])
+      if (event.shiftKey && lastSelectedId.current) {
+        const currentTabs = filteredTabsRef.current
+        const first = currentTabs.findIndex(({ id }) => id === lastSelectedId.current)
+        const last = currentTabs.findIndex(({ id }) => id === tabId)
+        if (first >= 0 && last >= 0) {
+          currentTabs
+            .slice(Math.min(first, last), Math.max(first, last) + 1)
+            .forEach(({ id }) => next.add(id))
+        }
+      } else if (next.has(tabId)) {
+        next.delete(tabId)
+      } else {
+        next.add(tabId)
       }
-    } else if (next.has(tabId)) {
-      next.delete(tabId)
-    } else {
-      next.add(tabId)
-    }
-    setSelectedIds(next)
-    onSelectionCountChange?.(next.size)
+      onSelectionCountChange?.(next.size)
+      return next
+    })
     lastSelectedId.current = tabId
-  }
+  }, [onSelectionCountChange])
 
   function moveSelected() {
-    const [kind, id] = destination.split(':')
-    if (!id || !selectedIds.size) return
-    const spaceId = kind === 'group' ? document.groups.find((group) => group.id === id)?.spaceId : id
-    if (!spaceId) return
+    const target = moveDestinations.find(({ value }) => value === destination)
+    if (!target || !selectedIds.size) return
     void updateDocument((current) =>
-      [...selectedIds].reduce(
-        (next, tabId) => moveTab(next, tabId, spaceId, kind === 'group' ? id : undefined),
-        current,
-      ),
+      moveTabs(current, selectedIds, target.spaceId, target.groupId),
     )
     setSelectedIds(new Set())
     onSelectionCountChange?.(0)
   }
+
+  const moveCard = useCallback((tabId: string, target: MoveDestination) => {
+    void updateDocument((current) =>
+      moveTab(current, tabId, target.spaceId, target.groupId),
+    )
+  }, [updateDocument])
 
   function card(tab: TabRecord) {
     return (
       <TabCard
         key={tab.id}
         tab={tab}
-        document={document}
+        moveDestinations={moveDestinations}
         updateDocument={updateDocument}
         onError={onError}
+        onMove={moveCard}
         selected={selectedIds.has(tab.id)}
-        onSelect={(event) => selectTab(tab.id, event)}
+        onSelect={selectTab}
         dense={dense}
       />
     )
@@ -187,27 +243,28 @@ export function Workspace({ document, updateDocument, onError, onSelectionCountC
         <div className="mt-5 flex flex-wrap items-center gap-3 rounded-xl border border-violet-400/20 bg-violet-400/8 px-3 py-2.5">
           <span className="text-xs text-violet-200">{selectedIds.size} selected</span>
           <select className="rounded-lg border border-white/10 bg-[#17171e] px-2 py-1.5 text-xs text-zinc-300" value={destination} onChange={(event) => setDestination(event.target.value)} aria-label="Bulk destination">
-            {document.spaces.map((space) => <option key={`space:${space.id}`} value={`space:${space.id}`}>{space.name} / Ungrouped</option>)}
-            {document.groups.map((group) => <option key={`group:${group.id}`} value={`group:${group.id}`}>{document.spaces.find(({ id }) => id === group.spaceId)?.name} / {group.name}</option>)}
+            {moveDestinations.map((target) => (
+              <option key={target.value} value={target.value}>{target.label}</option>
+            ))}
           </select>
           <button className="rounded-lg bg-violet-500 px-3 py-1.5 text-xs hover:bg-violet-400" onClick={moveSelected} type="button">Move</button>
           <button className="ml-auto text-xs text-zinc-500 hover:text-white" onClick={() => { setSelectedIds(new Set()); onSelectionCountChange?.(0) }} type="button">Clear</button>
         </div>
       ) : null}
 
-      {query && !filteredTabs.length ? (
+      {deferredQuery && !filteredTabs.length ? (
         <div className="mt-7 grid min-h-64 place-items-center rounded-2xl border border-dashed border-white/10 text-center">
           <div><Search className="mx-auto size-6 text-zinc-700" /><p className="mt-3 text-sm text-zinc-400">No tabs match “{query}”</p><button className="mt-2 text-xs text-violet-400" onClick={() => setQuery('')} type="button">Clear search</button></div>
         </div>
       ) : (
         <div className="mt-7 space-y-5">
           {groups.map((group) => {
-            const tabs = document.tabs.filter((tab) => tab.groupId === group.id && filteredIds.has(tab.id))
-            if (query && !tabs.length) return null
+            const tabs = tabsByGroup.get(group.id) ?? []
+            if (deferredQuery && !tabs.length) return null
             return (
               <section
                 key={group.id}
-                className={`overflow-hidden rounded-2xl border bg-white/[0.018] transition ${dropTarget === `group:${group.id}` ? 'border-violet-400/70 bg-violet-400/8 ring-2 ring-violet-400/20' : 'border-white/8'}`}
+                className={`overflow-hidden rounded-2xl border bg-white/[0.018] transition [contain-intrinsic-size:auto_24rem] [content-visibility:auto] ${dropTarget === `group:${group.id}` ? 'border-violet-400/70 bg-violet-400/8 ring-2 ring-violet-400/20' : 'border-white/8'}`}
                 aria-label={`${group.name} group drop area`}
                 onDragEnter={(event) => { event.preventDefault(); setDropTarget(`group:${group.id}`) }}
                 onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = 'move' }}
@@ -229,9 +286,9 @@ export function Workspace({ document, updateDocument, onError, onSelectionCountC
             )
           })}
 
-          {(!query || ungroupedTabs.length) ? (
+          {(!deferredQuery || ungroupedTabs.length) ? (
             <section
-              className={`overflow-hidden rounded-2xl border bg-white/[0.012] transition ${dropTarget === 'ungrouped' ? 'border-violet-400/70 bg-violet-400/8 ring-2 ring-violet-400/20' : 'border-white/8'}`}
+              className={`overflow-hidden rounded-2xl border bg-white/[0.012] transition [contain-intrinsic-size:auto_24rem] [content-visibility:auto] ${dropTarget === 'ungrouped' ? 'border-violet-400/70 bg-violet-400/8 ring-2 ring-violet-400/20' : 'border-white/8'}`}
               aria-label="Ungrouped tabs drop area"
               onDragEnter={(event) => { event.preventDefault(); setDropTarget('ungrouped') }}
               onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = 'move' }}
@@ -248,4 +305,4 @@ export function Workspace({ document, updateDocument, onError, onSelectionCountC
       {showNewGroup ? <NewGroupDialog onClose={() => setShowNewGroup(false)} onCreate={(name, color) => { void updateDocument((current) => createGroup(current, activeSpaceId, name, color)).catch(() => onError('TabSpace could not create that group.')); setShowNewGroup(false) }} /> : null}
     </>
   )
-}
+})

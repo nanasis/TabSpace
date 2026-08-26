@@ -19,6 +19,7 @@ export function useTabSpaceDocument(repository: DocumentRepository): DocumentSta
   const [loading, setLoading] = useState(true)
   const documentRef = useRef<TabSpaceDocument | undefined>(undefined)
   const writeQueue = useRef(Promise.resolve())
+  const pendingLocalWrites = useRef(new Set<string>())
 
   useEffect(() => {
     let active = true
@@ -60,6 +61,9 @@ export function useTabSpaceDocument(repository: DocumentRepository): DocumentSta
 
       try {
         const nextDocument = migrateDocument(nextValue).document
+        if (pendingLocalWrites.current.delete(nextDocument.updatedAt)) {
+          return
+        }
         documentRef.current = nextDocument
         setDocument(nextDocument)
         setError(undefined)
@@ -87,9 +91,12 @@ export function useTabSpaceDocument(repository: DocumentRepository): DocumentSta
         documentRef.current = nextDocument
         setDocument(nextDocument)
         try {
+          pendingLocalWrites.current.add(nextDocument.updatedAt)
           await repository.save(nextDocument)
+          setTimeout(() => pendingLocalWrites.current.delete(nextDocument.updatedAt), 1_000)
           setError(undefined)
         } catch {
+          pendingLocalWrites.current.delete(nextDocument.updatedAt)
           documentRef.current = currentDocument
           setDocument(currentDocument)
           setError('TabSpace could not save that change. Please try again.')

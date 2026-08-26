@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { createDefaultDocument, tabSpaceDocumentSchema } from './document'
 import { createGroup } from './groupOperations'
-import { moveTab, updateTab } from './tabOperations'
+import { moveTab, moveTabs, updateTab } from './tabOperations'
 
 const NOW = '2026-08-25T12:00:00.000Z'
 
@@ -50,6 +50,24 @@ describe('tab operations', () => {
 
     expect(grouped.tabs[0]?.groupId).toBe('group-1')
     expect(ungrouped.tabs[0]?.groupId).toBeUndefined()
+  })
+
+  it('moves multiple tabs in one validated operation', () => {
+    const initial = populatedDocument()
+    const withSecondTab = tabSpaceDocumentSchema.parse({
+      ...initial,
+      tabs: [
+        ...initial.tabs,
+        { ...initial.tabs[0], id: 'tab-2', chromeTabId: 11, order: 1 },
+      ],
+    })
+
+    const result = moveTabs(withSecondTab, ['tab-1', 'tab-2'], 'space-1', 'group-1', NOW)
+
+    expect(result.tabs.map(({ groupId, order }) => ({ groupId, order }))).toEqual([
+      { groupId: 'group-1', order: 0 },
+      { groupId: 'group-1', order: 1 },
+    ])
   })
 
   it('rejects a group outside the destination space', () => {

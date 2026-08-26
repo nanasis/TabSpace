@@ -1,5 +1,5 @@
 import { Globe2, Layers3, Pin, Rows3 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { memo, useMemo, useState } from 'react'
 
 import type { TabSpaceDocument } from '../model/document'
 import { activateBrowserTab } from '../tabs/chromeTabs'
@@ -13,7 +13,7 @@ export interface SidebarProps {
 
 type TabView = 'open' | 'pinned'
 
-export function Sidebar({ document, currentWindowId, onActionError }: SidebarProps) {
+export const Sidebar = memo(function Sidebar({ document, currentWindowId, onActionError }: SidebarProps) {
   const [view, setView] = useState<TabView>('open')
   const openTabs = useMemo(
     () =>
@@ -100,7 +100,7 @@ export function Sidebar({ document, currentWindowId, onActionError }: SidebarPro
                 {tab.avatarEmoji ? (
                   <span className="text-sm">{tab.avatarEmoji}</span>
                 ) : tab.faviconUrl ? (
-                  <img className="size-4" src={tab.faviconUrl} alt="" />
+                  <img className="size-4" src={tab.faviconUrl} alt="" loading="lazy" decoding="async" />
                 ) : (
                   <Globe2 className="size-3.5" />
                 )}
@@ -124,4 +124,4 @@ export function Sidebar({ document, currentWindowId, onActionError }: SidebarPro
       </div>
     </aside>
   )
-}
+})

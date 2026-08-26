@@ -11,13 +11,33 @@ function escapeHtml(value: string) {
 }
 
 function groupedTabs(document: TabSpaceDocument) {
+  const groupsBySpace = new Map<string, typeof document.groups>()
+  const tabsByGroup = new Map<string, typeof document.tabs>()
+  const ungroupedBySpace = new Map<string, typeof document.tabs>()
+
+  document.groups.forEach((group) => {
+    const groups = groupsBySpace.get(group.spaceId)
+    if (groups) groups.push(group)
+    else groupsBySpace.set(group.spaceId, [group])
+  })
+  document.tabs.forEach((tab) => {
+    if (tab.groupId) {
+      const tabs = tabsByGroup.get(tab.groupId)
+      if (tabs) tabs.push(tab)
+      else tabsByGroup.set(tab.groupId, [tab])
+    } else {
+      const tabs = ungroupedBySpace.get(tab.spaceId)
+      if (tabs) tabs.push(tab)
+      else ungroupedBySpace.set(tab.spaceId, [tab])
+    }
+  })
+
   return [...document.spaces].sort((a, b) => a.order - b.order).map((space) => ({
     space,
-    groups: [...document.groups]
-      .filter(({ spaceId }) => spaceId === space.id)
+    groups: [...(groupsBySpace.get(space.id) ?? [])]
       .sort((a, b) => a.order - b.order)
-      .map((group) => ({ group, tabs: document.tabs.filter(({ groupId }) => groupId === group.id) })),
-    ungrouped: document.tabs.filter((tab) => tab.spaceId === space.id && !tab.groupId),
+      .map((group) => ({ group, tabs: tabsByGroup.get(group.id) ?? [] })),
+    ungrouped: ungroupedBySpace.get(space.id) ?? [],
   }))
 }
 

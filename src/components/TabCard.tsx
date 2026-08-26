@@ -1,8 +1,8 @@
 import { Check, Copy, ExternalLink, Globe2, Pencil, Pin, PinOff, SmilePlus, X } from 'lucide-react'
-import type { MouseEvent } from 'react'
+import { memo, useState, type MouseEvent } from 'react'
 
 import type { TabRecord, TabSpaceDocument } from '../model/document'
-import { moveTab, updateTab } from '../model/tabOperations'
+import { updateTab } from '../model/tabOperations'
 import {
   activateBrowserTab,
   closeBrowserTab,
@@ -11,13 +11,21 @@ import {
 } from '../tabs/chromeTabs'
 import { writeTabDragPayload } from '../tabs/tabDrag'
 
+export interface MoveDestination {
+  value: string
+  label: string
+  spaceId: string
+  groupId?: string
+}
+
 export interface TabCardProps {
   tab: TabRecord
-  document: TabSpaceDocument
+  moveDestinations: MoveDestination[]
   updateDocument(transform: (document: TabSpaceDocument) => TabSpaceDocument): Promise<void>
   onError(message: string): void
+  onMove(tabId: string, destination: MoveDestination): void
   selected?: boolean
-  onSelect?(event: MouseEvent<HTMLButtonElement>): void
+  onSelect?(tabId: string, event: MouseEvent<HTMLButtonElement>): void
   dense?: boolean
 }
 
@@ -40,7 +48,18 @@ function relativeAccess(timestamp: string) {
   return `${Math.floor(hours / 24)}d ago`
 }
 
-export function TabCard({ tab, document, updateDocument, onError, selected, onSelect, dense }: TabCardProps) {
+export const TabCard = memo(function TabCard({
+  tab,
+  moveDestinations,
+  updateDocument,
+  onError,
+  onMove,
+  selected,
+  onSelect,
+  dense,
+}: TabCardProps) {
+  const [choosingDestination, setChoosingDestination] = useState(false)
+
   async function open() {
     try {
       if (tab.chromeTabId === undefined) await openBrowserTab(tab.url)
@@ -102,7 +121,7 @@ export function TabCard({ tab, document, updateDocument, onError, selected, onSe
       {onSelect ? (
         <button
           className={`absolute -left-2 -top-2 z-10 grid size-5 place-items-center rounded-md border transition ${selected ? 'border-violet-400 bg-violet-500 text-white' : 'border-white/15 bg-[#1b1b23] text-transparent opacity-0 group-hover:opacity-100 focus:opacity-100'}`}
-          onClick={onSelect}
+          onClick={(event) => onSelect(tab.id, event)}
           aria-label={`${selected ? 'Deselect' : 'Select'} ${tab.alias ?? tab.title}`}
           aria-pressed={selected}
           type="button"
@@ -112,7 +131,7 @@ export function TabCard({ tab, document, updateDocument, onError, selected, onSe
       ) : null}
       <div className="flex items-start gap-3">
         <button className="grid size-9 shrink-0 place-items-center overflow-hidden rounded-xl bg-white/5" onClick={chooseAvatar} aria-label={`Change avatar for ${tab.alias ?? tab.title}`} type="button">
-          {tab.avatarEmoji ? <span className="text-lg">{tab.avatarEmoji}</span> : tab.faviconUrl ? <img className="size-5" src={tab.faviconUrl} alt="" /> : <Globe2 className="size-4 text-zinc-600" />}
+          {tab.avatarEmoji ? <span className="text-lg">{tab.avatarEmoji}</span> : tab.faviconUrl ? <img className="size-5" src={tab.faviconUrl} alt="" loading="lazy" decoding="async" /> : <Globe2 className="size-4 text-zinc-600" />}
         </button>
         <button className="min-w-0 flex-1 text-left" onClick={() => void open()} type="button">
           <span className="block truncate text-sm font-medium text-zinc-200">{tab.alias ?? tab.title}</span>
@@ -132,27 +151,35 @@ export function TabCard({ tab, document, updateDocument, onError, selected, onSe
         <button className="icon-button" onClick={() => void togglePinned()} aria-label={tab.pinned ? 'Unpin tab' : 'Pin tab'} type="button">{tab.pinned ? <PinOff className="size-3" /> : <Pin className="size-3" />}</button>
         <button className="icon-button" onClick={() => void navigator.clipboard.writeText(tab.url).catch(() => onError('Could not copy this URL.'))} aria-label="Copy tab URL" type="button"><Copy className="size-3" /></button>
         <button className="icon-button" onClick={() => void open()} aria-label="Open tab" type="button"><ExternalLink className="size-3" /></button>
-        <SmilePlus className="ml-1 size-3 text-zinc-800" aria-hidden="true" />
-        <select
-          className="ml-auto min-w-0 max-w-28 rounded-md border border-white/8 bg-black/20 px-1.5 py-1 text-[9px] text-zinc-500 outline-none"
-          value={tab.groupId ? `group:${tab.groupId}` : `space:${tab.spaceId}`}
-          onChange={(event) => {
-            const [kind, id] = event.target.value.split(':')
-            if (!id) return
-            const destinationSpaceId = kind === 'group' ? document.groups.find((group) => group.id === id)?.spaceId : id
-            if (!destinationSpaceId) return
-            void updateDocument((current) => moveTab(current, tab.id, destinationSpaceId, kind === 'group' ? id : undefined))
-          }}
-          aria-label={`Move ${tab.alias ?? tab.title}`}
-        >
-          {document.spaces.map((space) => (
-            <option key={`space:${space.id}`} value={`space:${space.id}`}>{space.name} / Ungrouped</option>
-          ))}
-          {document.groups.map((group) => (
-            <option key={`group:${group.id}`} value={`group:${group.id}`}>{document.spaces.find(({ id }) => id === group.spaceId)?.name} / {group.name}</option>
-          ))}
-        </select>
+        {choosingDestination ? (
+          <select
+            autoFocus
+            className="ml-auto min-w-0 max-w-36 rounded-md border border-violet-400/30 bg-black/20 px-1.5 py-1 text-[9px] text-zinc-400 outline-none"
+            defaultValue=""
+            onBlur={() => setChoosingDestination(false)}
+            onChange={(event) => {
+              const destination = moveDestinations.find(({ value }) => value === event.target.value)
+              if (destination) onMove(tab.id, destination)
+              setChoosingDestination(false)
+            }}
+            aria-label={`Move ${tab.alias ?? tab.title}`}
+          >
+            <option value="" disabled>Move to…</option>
+            {moveDestinations.map((destination) => (
+              <option key={destination.value} value={destination.value}>{destination.label}</option>
+            ))}
+          </select>
+        ) : (
+          <button
+            className="ml-auto flex items-center gap-1 rounded-md border border-white/8 px-1.5 py-1 text-[9px] text-zinc-600 hover:border-violet-400/30 hover:text-violet-300"
+            onClick={() => setChoosingDestination(true)}
+            aria-label={`Choose destination for ${tab.alias ?? tab.title}`}
+            type="button"
+          >
+            <SmilePlus className="size-3" aria-hidden="true" /> Move
+          </button>
+        )}
       </div>
     </article>
   )
-}
+})

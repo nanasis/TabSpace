@@ -138,6 +138,9 @@ describe('workspace components', () => {
     render(<Workspace document={document} updateDocument={vi.fn()} onError={vi.fn()} />)
     expect(screen.getByRole('heading', { name: 'Sources' })).toBeInTheDocument()
     expect(screen.getByText('Example')).toBeInTheDocument()
+    expect(screen.queryByRole('combobox', { name: 'Move Example' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: 'Choose destination for Example' }))
+    expect(screen.getByRole('combobox', { name: 'Move Example' })).toBeInTheDocument()
 
     await user.type(screen.getByRole('textbox', { name: 'Search tabs' }), 'missing')
     expect(screen.getByText(/No tabs match/)).toBeInTheDocument()

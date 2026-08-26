@@ -16,12 +16,10 @@ export function updateTab(
   })
 }
 
-export function moveTab(
+function validateDestination(
   document: TabSpaceDocument,
-  tabId: string,
   destinationSpaceId: string,
   destinationGroupId?: string,
-  updatedAt = new Date().toISOString(),
 ) {
   if (!document.spaces.some(({ id }) => id === destinationSpaceId)) {
     throw new OrganizationError('Tab destination space does not exist')
@@ -32,23 +30,53 @@ export function moveTab(
       throw new OrganizationError('Tab destination group must be in the destination space')
     }
   }
+}
 
-  const destinationOrder = document.tabs.filter(
-    (tab) => tab.spaceId === destinationSpaceId && tab.groupId === destinationGroupId,
+export function moveTabs(
+  document: TabSpaceDocument,
+  tabIds: Iterable<string>,
+  destinationSpaceId: string,
+  destinationGroupId?: string,
+  updatedAt = new Date().toISOString(),
+) {
+  validateDestination(document, destinationSpaceId, destinationGroupId)
+  const movedTabIds = new Set(tabIds)
+  if (!movedTabIds.size) return document
+
+  let destinationOrder = document.tabs.filter(
+    (tab) =>
+      !movedTabIds.has(tab.id) &&
+      tab.spaceId === destinationSpaceId &&
+      tab.groupId === destinationGroupId,
   ).length
-  return tabSpaceDocumentSchema.parse({
-    ...document,
-    tabs: document.tabs.map((tab) =>
-      tab.id === tabId
-        ? {
-            ...tab,
-            spaceId: destinationSpaceId,
-            groupId: destinationGroupId,
-            order: destinationOrder,
-            updatedAt,
-          }
-        : tab,
-    ),
-    updatedAt,
+  const tabs = document.tabs.map((tab) => {
+    if (!movedTabIds.has(tab.id)) return tab
+    const movedTab = {
+      ...tab,
+      spaceId: destinationSpaceId,
+      groupId: destinationGroupId,
+      order: destinationOrder,
+      updatedAt,
+    }
+    destinationOrder += 1
+    return movedTab
   })
+
+  return tabSpaceDocumentSchema.parse({ ...document, tabs, updatedAt })
+}
+
+export function moveTab(
+  document: TabSpaceDocument,
+  tabId: string,
+  destinationSpaceId: string,
+  destinationGroupId?: string,
+  updatedAt = new Date().toISOString(),
+) {
+  return moveTabs(
+    document,
+    [tabId],
+    destinationSpaceId,
+    destinationGroupId,
+    updatedAt,
+  )
 }

@@ -99,6 +99,7 @@ export function reconcileTabs(
   )
   let changed = retainedRecords.length !== document.tabs.length
   const nextRecords = [...retainedRecords]
+  const nextRecordIndexes = new Map(nextRecords.map((record, index) => [record.id, index]))
   let nextOrder =
     Math.max(
       -1,
@@ -116,7 +117,7 @@ export function reconcileTabs(
         continue
       }
 
-      const index = nextRecords.findIndex(({ id }) => id === existing.id)
+      const index = nextRecordIndexes.get(existing.id) ?? -1
       if (index >= 0) {
         nextRecords[index] = {
           ...existing,
@@ -134,7 +135,7 @@ export function reconcileTabs(
       continue
     }
 
-    nextRecords.push({
+    const newRecord: TabRecord = {
       id: createId(),
       chromeTabId: tab.id,
       windowId: tab.windowId,
@@ -148,7 +149,9 @@ export function reconcileTabs(
       lastAccessedAt: nextAccessedAt,
       createdAt: timestamp,
       updatedAt: timestamp,
-    })
+    }
+    nextRecordIndexes.set(newRecord.id, nextRecords.length)
+    nextRecords.push(newRecord)
     nextOrder += 1
     changed = true
   }
