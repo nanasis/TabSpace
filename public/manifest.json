@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "TabSpace",
   "short_name": "TabSpace",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Organize and manage your open tabs in focused spaces.",
   "homepage_url": "https://github.com/nanasis/TabSpace",
   "icons": {

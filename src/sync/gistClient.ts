@@ -24,6 +24,13 @@ export interface PulledGist extends GistResult {
   backup: TabSpaceBackup
 }
 
+interface GistSummary {
+  id?: string
+  description?: string
+  updated_at?: string
+  files?: Record<string, unknown>
+}
+
 function currentGistVersion(body: { history?: Array<{ version?: string }> }) {
   return body.history?.[0]?.version
 }
@@ -56,12 +63,66 @@ export function createGistClient(fetcher: typeof fetch = fetch) {
     return response
   }
 
+  async function pullGist(token: string, gistId: string): Promise<PulledGist> {
+    const response = await request(token, `/gists/${encodeURIComponent(gistId)}`)
+    const body = await response.json() as {
+      files?: Record<string, { content?: string }>
+      history?: Array<{ version?: string }>
+    }
+    const contents = body.files?.[GIST_FILENAME]?.content
+    if (!contents) throw new GitHubApiError(`The Gist does not contain ${GIST_FILENAME}`, 422)
+    return {
+      gistId,
+      revision: currentGistVersion(body),
+      backup: backupSchema.parse(JSON.parse(contents) as unknown),
+    }
+  }
+
   return {
     async validateToken(token: string) {
       const response = await request(token, '/user')
       const body = await response.json() as { login?: string }
       if (!body.login) throw new GitHubApiError('GitHub did not return an account name', 502)
       return body.login
+    },
+
+    async findExisting(token: string): Promise<PulledGist | undefined> {
+      const summaries: GistSummary[] = []
+      for (let page = 1; page <= 10; page += 1) {
+        const response = await request(token, `/gists?per_page=100&page=${page}`)
+        const pageSummaries = await response.json() as GistSummary[]
+        summaries.push(...pageSummaries)
+        if (pageSummaries.length < 100) break
+      }
+
+      const candidates = summaries
+        .filter(
+          (gist): gist is GistSummary & { id: string } =>
+            Boolean(gist.id && gist.files && GIST_FILENAME in gist.files),
+        )
+        .sort((left, right) => {
+          const preferredDifference =
+            Number(right.description === 'TabSpace private synchronization backup') -
+            Number(left.description === 'TabSpace private synchronization backup')
+          if (preferredDifference) return preferredDifference
+          return Date.parse(right.updated_at ?? '') - Date.parse(left.updated_at ?? '')
+        })
+
+      for (const candidate of candidates) {
+        try {
+          return await pullGist(token, candidate.id)
+        } catch (error) {
+          if (
+            error instanceof GitHubApiError &&
+            error.status !== 404 &&
+            error.status !== 422
+          ) {
+            throw error
+          }
+          // Ignore unrelated or invalid files with the same name and check the next candidate.
+        }
+      }
+      return undefined
     },
 
     async create(token: string, backup: TabSpaceBackup): Promise<GistResult> {
@@ -100,20 +161,7 @@ export function createGistClient(fetcher: typeof fetch = fetch) {
       return { gistId, revision: currentGistVersion(body) }
     },
 
-    async pull(token: string, gistId: string): Promise<PulledGist> {
-      const response = await request(token, `/gists/${encodeURIComponent(gistId)}`)
-      const body = await response.json() as {
-        files?: Record<string, { content?: string }>
-        history?: Array<{ version?: string }>
-      }
-      const contents = body.files?.[GIST_FILENAME]?.content
-      if (!contents) throw new GitHubApiError(`The Gist does not contain ${GIST_FILENAME}`, 422)
-      return {
-        gistId,
-        revision: currentGistVersion(body),
-        backup: backupSchema.parse(JSON.parse(contents) as unknown),
-      }
-    },
+    pull: pullGist,
   }
 }
 

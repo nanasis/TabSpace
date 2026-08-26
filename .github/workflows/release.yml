@@ -3,7 +3,7 @@ name: Build GitHub release
 on:
   push:
     tags:
-      - 'v0.1.0'
+      - 'v*'
 
 permissions:
   contents: write
@@ -27,13 +27,13 @@ jobs:
       - run: npm run build:site
       - run: node scripts/package-extension.mjs
       - name: Create checksum
-        run: cd release && sha256sum tabspace-v0.1.0.zip > tabspace-v0.1.0.zip.sha256
+        run: cd release && sha256sum "tabspace-${GITHUB_REF_NAME}.zip" > "tabspace-${GITHUB_REF_NAME}.zip.sha256"
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          name: TabSpace v0.1.0
-          body_path: docs/releases/v0.1.0.md
+          name: TabSpace ${{ github.ref_name }}
+          body_path: docs/releases/${{ github.ref_name }}.md
           files: |
-            release/tabspace-v0.1.0.zip
-            release/tabspace-v0.1.0.zip.sha256
+            release/tabspace-${{ github.ref_name }}.zip
+            release/tabspace-${{ github.ref_name }}.zip.sha256
           fail_on_unmatched_files: true

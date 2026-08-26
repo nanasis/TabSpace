@@ -4,6 +4,11 @@ import { resolve } from 'node:path'
 const outputDirectory = resolve('dist')
 const manifestPath = resolve(outputDirectory, 'manifest.json')
 const manifest = JSON.parse(await readFile(manifestPath, 'utf8'))
+const packageJson = JSON.parse(await readFile(resolve('package.json'), 'utf8'))
+
+if (manifest.version !== packageJson.version) {
+  throw new Error('The extension manifest and package versions must match')
+}
 
 if (manifest.manifest_version !== 3) {
   throw new Error('The production manifest must use Manifest V3')

@@ -22,7 +22,7 @@ TabSpace is a privacy-conscious Chrome extension for organizing open and saved t
 ## Install the GitHub release
 
 1. Open the [latest GitHub release](https://github.com/nanasis/TabSpace/releases/latest).
-2. Download `tabspace-v0.1.0.zip` from **Assets**.
+2. Download `tabspace-v0.1.1.zip` from **Assets**.
 3. Extract the ZIP to a permanent folder. The selected folder must directly contain `manifest.json`.
 4. Open `chrome://extensions` in Chrome.
 5. Enable **Developer mode**.
@@ -31,16 +31,16 @@ TabSpace is a privacy-conscious Chrome extension for organizing open and saved t
 
 Chrome does not automatically update unpacked extensions. For a future release, download and extract the new ZIP over the existing folder, then select **Reload** on the TabSpace card in `chrome://extensions`.
 
-The release also provides `tabspace-v0.1.0.zip.sha256`. Verify it with:
+The release also provides `tabspace-v0.1.1.zip.sha256`. Verify it with:
 
 ```powershell
-Get-FileHash .\tabspace-v0.1.0.zip -Algorithm SHA256
+Get-FileHash .\tabspace-v0.1.1.zip -Algorithm SHA256
 ```
 
 or:
 
 ```bash
-sha256sum tabspace-v0.1.0.zip
+sha256sum tabspace-v0.1.1.zip
 ```
 
 Compare the output with the checksum file before loading the extension.
@@ -73,7 +73,7 @@ Available commands:
 | `npm test` | Run Vitest unit and component tests |
 | `npm run test:e2e` | Run the production-dashboard Playwright workflow |
 | `npm run build` | Build and verify the unpacked extension in `dist/` |
-| `npm run package` | Build and create `release/tabspace-v0.1.0.zip` |
+| `npm run package` | Build and create `release/tabspace-v0.1.1.zip` |
 | `npm run validate` | Run lint, types, tests, build verification, and E2E |
 
 ## Install a source build locally in Chrome
@@ -118,7 +118,8 @@ Exports preserve space/group hierarchy where the target format permits it. Backu
 3. Select only the **`gist`** scope. No repository scope is required.
 4. Generate and copy the token; GitHub displays it only once.
 5. Open TabSpace **Settings** and paste it into **Private GitHub Gist sync**, then select **Connect**.
-6. Create a private Gist or push an update. Use **Pull** to confirm and restore the remote backup.
+6. TabSpace searches that GitHub account for the newest valid private Gist containing `tabspace-backup.json`. If one exists—such as a backup created on another device—the existing Gist ID and history version are linked automatically and **Pull** becomes available immediately.
+7. If no backup exists, choose **Create private Gist**. Use **Push update** to save later changes and confirmed **Pull** to restore the remote backup on another device.
 
 Never post, commit, or send a token in chat. If one is exposed, revoke it immediately under **GitHub Settings → Developer settings → Personal access tokens** and create a replacement.
 

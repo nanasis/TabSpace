@@ -30,6 +30,74 @@ describe('GitHub Gist client', () => {
     }))
   })
 
+  it('discovers and validates an existing TabSpace backup for another device', async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse([
+        {
+          id: 'unrelated',
+          description: 'Other backup',
+          updated_at: '2026-08-26T12:00:00Z',
+          files: { [GIST_FILENAME]: {} },
+        },
+        {
+          id: 'tabspace-gist',
+          description: 'TabSpace private synchronization backup',
+          updated_at: '2026-08-25T12:00:00Z',
+          files: { [GIST_FILENAME]: {} },
+        },
+      ]))
+      .mockResolvedValueOnce(jsonResponse({
+        files: { [GIST_FILENAME]: { content: JSON.stringify(backup) } },
+        history: [{ version: VERSION_1 }],
+      }))
+
+    await expect(createGistClient(fetcher).findExisting('secret')).resolves.toEqual({
+      gistId: 'tabspace-gist',
+      revision: VERSION_1,
+      backup,
+    })
+    expect(fetcher.mock.calls[0]?.[0]).toBe(
+      'https://api.github.com/gists?per_page=100&page=1',
+    )
+    expect(fetcher.mock.calls[1]?.[0]).toBe(
+      'https://api.github.com/gists/tabspace-gist',
+    )
+  })
+
+  it('skips invalid matching Gists and checks the next candidate', async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(jsonResponse([
+        {
+          id: 'invalid-gist',
+          description: 'TabSpace private synchronization backup',
+          files: { [GIST_FILENAME]: {} },
+        },
+        {
+          id: 'valid-gist',
+          description: 'Other backup',
+          files: { [GIST_FILENAME]: {} },
+        },
+      ]))
+      .mockResolvedValueOnce(jsonResponse({ files: {} }))
+      .mockResolvedValueOnce(jsonResponse({
+        files: { [GIST_FILENAME]: { content: JSON.stringify(backup) } },
+        history: [{ version: VERSION_1 }],
+      }))
+
+    await expect(createGistClient(fetcher).findExisting('secret')).resolves.toEqual(
+      expect.objectContaining({ gistId: 'valid-gist', backup }),
+    )
+  })
+
+  it('returns no existing backup when the account has no TabSpace Gist', async () => {
+    const fetcher = vi.fn().mockResolvedValue(jsonResponse([]))
+
+    await expect(createGistClient(fetcher).findExisting('secret')).resolves.toBeUndefined()
+    expect(fetcher).toHaveBeenCalledOnce()
+  })
+
   it('creates a private Gist with canonical backup JSON', async () => {
     const fetcher = vi.fn().mockResolvedValue(jsonResponse({
       id: 'gist-1',

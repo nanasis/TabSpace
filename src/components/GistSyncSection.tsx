@@ -48,11 +48,33 @@ export function GistSyncSection({ document, updateDocument }: GistSyncSectionPro
     setError(undefined)
     try {
       const login = await client.validateToken(token)
+      const existingGist = await client.findExisting(token)
       await storeSessionToken(token)
+
+      const discoveredAt = new Date().toISOString()
+      await updateDocument((current) =>
+        tabSpaceDocumentSchema.parse({
+          ...current,
+          sync: existingGist
+            ? {
+                gistId: existingGist.gistId,
+                ...(existingGist.revision
+                  ? { lastKnownRevision: existingGist.revision }
+                  : {}),
+              }
+            : {},
+          updatedAt: discoveredAt,
+        }),
+      )
+
       setTokenInput('')
       setAccount(login)
       setConnected(true)
-      setStatus(`Connected to GitHub as ${login}.`)
+      setStatus(
+        existingGist
+          ? `Connected as ${login}. Existing TabSpace backup found—select Pull to restore it.`
+          : `Connected to GitHub as ${login}. No existing TabSpace backup was found.`,
+      )
     } catch (caught) {
       setError(messageFor(caught))
     } finally {
@@ -133,7 +155,7 @@ export function GistSyncSection({ document, updateDocument }: GistSyncSectionPro
   return (
     <div className="rounded-xl border border-white/8 bg-black/15 p-4">
       <div className="text-sm font-medium">Private GitHub Gist sync</div>
-      <p className="mt-2 text-xs leading-5 text-zinc-500">Use a classic personal access token with only the <code className="text-violet-300">gist</code> scope. The token stays in Chrome session storage and is never included in backups.</p>
+      <p className="mt-2 text-xs leading-5 text-zinc-500">Use a classic personal access token with only the <code className="text-violet-300">gist</code> scope. After connecting, TabSpace checks the account for an existing valid <code className="text-violet-300">tabspace-backup.json</code> so another device can enable Pull immediately. The token stays in Chrome session storage and is never included in backups.</p>
       <details className="mt-3 rounded-lg border border-white/8 bg-black/15 px-3 py-2 text-xs text-zinc-400">
         <summary className="cursor-pointer font-medium text-zinc-300">How to create the GitHub token</summary>
         <ol className="mt-2 list-decimal space-y-1.5 pl-4 leading-5 text-zinc-500">

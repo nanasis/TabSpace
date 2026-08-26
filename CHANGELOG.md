@@ -2,6 +2,20 @@
 
 All notable changes to TabSpace are documented here.
 
+## [0.1.1] - 2026-08-26
+
+### Added
+
+- Automatic discovery of existing private TabSpace Gists after GitHub connection
+- Cross-device restore readiness without manually copying a Gist ID
+- Pagination across up to 1,000 recent Gists and validation of matching backup files
+
+### Changed
+
+- Prefer the official TabSpace synchronization Gist, then the newest valid matching backup
+- Clear stale local Gist metadata when the connected account has no TabSpace backup
+- Generalize the tag-triggered release workflow for version-matched packages and notes
+
 ## [0.1.0] - 2026-08-26
 
 ### Added
@@ -25,4 +39,5 @@ All notable changes to TabSpace are documented here.
 - Sanitized imported URLs and favicon metadata
 - Unit, component, Chrome/GitHub boundary, production build, and Playwright coverage
 
+[0.1.1]: https://github.com/nanasis/TabSpace/releases/tag/v0.1.1
 [0.1.0]: https://github.com/nanasis/TabSpace/releases/tag/v0.1.0
