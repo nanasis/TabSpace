@@ -257,8 +257,8 @@ A work item is not complete until all seven steps pass. Material design differen
 
 #### Validation
 
-- GitHub client tests cover token validation, private Gist creation, conditional revision updates, validated pulls, and revoked/rate-limited API errors.
-- Fine-grained tokens are held only in `chrome.storage.session`; local documents and backup exports contain only Gist ID, timestamp, and revision metadata.
+- GitHub client tests cover token validation, private Gist creation, Gist-history version checks, validated pulls, and revoked/rate-limited API errors.
+- Classic tokens with only the `gist` scope are held in `chrome.storage.session`; local documents and backup exports contain only Gist ID, timestamp, and revision metadata.
 
 ### WI-17 — Implement dialogs and feedback
 
@@ -355,11 +355,14 @@ A work item is not complete until all seven steps pass. Material design differen
 - [x] Show every open tab from the dashboard's current Chrome window in the sidebar, independent of TabSpace space/group assignment.
 - [x] Close Import/Export automatically after a successful import and retain sanitized imported favicon URLs with a site fallback.
 - [x] Register the TabSpace dashboard as Chrome's Manifest V3 new-tab override while retaining toolbar open-or-focus behavior.
+- [x] Replace unsupported `If-Match` Gist updates with explicit history-version conflict checks and migrate legacy ETag metadata on the next push.
+- [x] Add in-product and README guidance for creating a classic GitHub PAT with only the `gist` scope.
 
 ### Validation
 
 - `npm run validate` passes ESLint, TypeScript, 61 Vitest tests, extension and website builds, manifest reference verification, and Playwright E2E.
 - Component tests cover open-only sidebar rendering, sidebar-to-group dragging, and group-to-group card dragging. Domain tests cover default-group creation, collision-safe naming, and atomic tab movement.
+- GitHub boundary tests cover successful history-version updates, remote conflicts, and legacy ETag compatibility without sending unsupported conditional PATCH headers.
 - Production build verification requires `chrome_url_overrides.newtab` to reference the built dashboard entry page.
 - Import tests cover Tabme direct items, nested group items, favicon fallback, and Replace behavior for matched and unmatched open tabs. Sidebar coverage verifies current-window filtering across multiple TabSpace spaces, and E2E verifies successful import dismissal. A shape-only check against a real Tabme backup produced 1 space, 28 groups, and 259 tabs with 259 favicon values and no skipped records; no private titles or URLs were logged or retained.
 

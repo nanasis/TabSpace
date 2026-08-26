@@ -81,12 +81,16 @@ Exports preserve space/group hierarchy where the target format permits it. Backu
 
 ### Private GitHub Gist synchronization
 
-1. Create a fine-grained GitHub personal access token with Gists permission.
-2. Open **Settings** and enter the token in **Private GitHub Gist sync**.
-3. Create a private Gist or push an update.
-4. Use **Pull** to confirm and restore the remote backup.
+1. Open [GitHub token creation](https://github.com/settings/tokens/new?scopes=gist&description=TabSpace), or navigate to **GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)**.
+2. Choose **Generate new token (classic)**, enter a descriptive note such as `TabSpace`, and choose an expiration.
+3. Select only the **`gist`** scope. No repository scope is required.
+4. Generate and copy the token; GitHub displays it only once.
+5. Open TabSpace **Settings** and paste it into **Private GitHub Gist sync**, then select **Connect**.
+6. Create a private Gist or push an update. Use **Pull** to confirm and restore the remote backup.
 
-The token is held only in `chrome.storage.session`, is cleared when disconnected or the browser session ends, and is never stored in the canonical document or export. TabSpace persists only the Gist ID, last-sync time, and revision. Conditional revisions prevent silently overwriting a changed remote Gist.
+Never post, commit, or send a token in chat. If one is exposed, revoke it immediately under **GitHub Settings → Developer settings → Personal access tokens** and create a replacement.
+
+The token is held only in `chrome.storage.session`, is cleared when disconnected or the browser session ends, and is never stored in the canonical document or export. TabSpace persists only the Gist ID, last-sync time, and Gist history version. A remote version check prevents silently overwriting a changed Gist.
 
 Private Gists are not end-to-end encrypted. GitHub can process their contents, including sensitive tab titles and URLs.
 
@@ -111,7 +115,7 @@ TabSpace does not inject scripts into websites and does not request browsing-his
 - Chrome is the only supported browser target.
 - A Tabme export that differs from the documented fixture profile may require a parser update because Tabme does not publish a stable public JSON schema.
 - Imported saved tabs are represented in the dashboard and open when selected; imports do not automatically open every URL.
-- GitHub authentication uses a user-provided fine-grained token rather than an OAuth application.
+- GitHub authentication uses a user-provided classic token with only the `gist` scope rather than an OAuth application.
 - Cross-device synchronization occurs only when the user explicitly pushes or pulls.
 
 ## Packaging

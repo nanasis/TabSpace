@@ -24,6 +24,14 @@ export interface PulledGist extends GistResult {
   backup: TabSpaceBackup
 }
 
+function currentGistVersion(body: { history?: Array<{ version?: string }> }) {
+  return body.history?.[0]?.version
+}
+
+function isGistVersion(value: string | undefined) {
+  return Boolean(value && /^[0-9a-f]{40}$/i.test(value))
+}
+
 export function createGistClient(fetcher: typeof fetch = fetch) {
   async function request(token: string, path: string, init: RequestInit = {}) {
     const response = await fetcher(`${API_ROOT}${path}`, {
@@ -65,28 +73,44 @@ export function createGistClient(fetcher: typeof fetch = fetch) {
           files: { [GIST_FILENAME]: { content: JSON.stringify(backup, null, 2) } },
         }),
       })
-      const body = await response.json() as { id?: string }
+      const body = await response.json() as {
+        id?: string
+        history?: Array<{ version?: string }>
+      }
       if (!body.id) throw new GitHubApiError('GitHub did not return a Gist ID', 502)
-      return { gistId: body.id, revision: response.headers.get('etag') ?? undefined }
+      return { gistId: body.id, revision: currentGistVersion(body) }
     },
 
     async update(token: string, gistId: string, backup: TabSpaceBackup, revision?: string): Promise<GistResult> {
+      if (isGistVersion(revision)) {
+        const currentResponse = await request(token, `/gists/${encodeURIComponent(gistId)}`)
+        const currentBody = await currentResponse.json() as {
+          history?: Array<{ version?: string }>
+        }
+        if (currentGistVersion(currentBody) !== revision) {
+          throw new GitHubApiError('The Gist changed remotely', 409)
+        }
+      }
+
       const response = await request(token, `/gists/${encodeURIComponent(gistId)}`, {
         method: 'PATCH',
-        headers: revision ? { 'If-Match': revision } : {},
         body: JSON.stringify({ files: { [GIST_FILENAME]: { content: JSON.stringify(backup, null, 2) } } }),
       })
-      return { gistId, revision: response.headers.get('etag') ?? undefined }
+      const body = await response.json() as { history?: Array<{ version?: string }> }
+      return { gistId, revision: currentGistVersion(body) }
     },
 
     async pull(token: string, gistId: string): Promise<PulledGist> {
       const response = await request(token, `/gists/${encodeURIComponent(gistId)}`)
-      const body = await response.json() as { files?: Record<string, { content?: string }> }
+      const body = await response.json() as {
+        files?: Record<string, { content?: string }>
+        history?: Array<{ version?: string }>
+      }
       const contents = body.files?.[GIST_FILENAME]?.content
       if (!contents) throw new GitHubApiError(`The Gist does not contain ${GIST_FILENAME}`, 422)
       return {
         gistId,
-        revision: response.headers.get('etag') ?? undefined,
+        revision: currentGistVersion(body),
         backup: backupSchema.parse(JSON.parse(contents) as unknown),
       }
     },

@@ -133,7 +133,17 @@ export function GistSyncSection({ document, updateDocument }: GistSyncSectionPro
   return (
     <div className="rounded-xl border border-white/8 bg-black/15 p-4">
       <div className="text-sm font-medium">Private GitHub Gist sync</div>
-      <p className="mt-2 text-xs leading-5 text-zinc-500">Use a fine-grained personal access token with Gists permission. The token stays in Chrome session storage and is never included in backups.</p>
+      <p className="mt-2 text-xs leading-5 text-zinc-500">Use a classic personal access token with only the <code className="text-violet-300">gist</code> scope. The token stays in Chrome session storage and is never included in backups.</p>
+      <details className="mt-3 rounded-lg border border-white/8 bg-black/15 px-3 py-2 text-xs text-zinc-400">
+        <summary className="cursor-pointer font-medium text-zinc-300">How to create the GitHub token</summary>
+        <ol className="mt-2 list-decimal space-y-1.5 pl-4 leading-5 text-zinc-500">
+          <li>Open GitHub Settings → Developer settings → Personal access tokens → Tokens (classic).</li>
+          <li>Select Generate new token (classic), add a descriptive name and expiration.</li>
+          <li>Select only the <code className="text-violet-300">gist</code> scope.</li>
+          <li>Generate the token, copy it once, and paste it below. Never share or commit it.</li>
+        </ol>
+        <a className="mt-2 inline-block text-violet-400 hover:text-violet-300" href="https://github.com/settings/tokens/new?scopes=gist&description=TabSpace" target="_blank" rel="noreferrer">Open GitHub token creation ↗</a>
+      </details>
       {!connected ? (
         <div className="mt-3 flex gap-2">
           <input className="min-w-0 flex-1 rounded-lg border border-white/10 bg-black/20 px-3 py-2 text-xs outline-none focus:border-violet-400/40" type="password" autoComplete="off" value={tokenInput} onChange={(event) => setTokenInput(event.target.value)} placeholder="github_pat_…" aria-label="GitHub token" />
