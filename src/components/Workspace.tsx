@@ -29,7 +29,7 @@ import {
   moveGroup,
   updateGroup,
 } from '../model/groupOperations'
-import { moveTab, moveTabs } from '../model/tabOperations'
+import { deleteTabCard, moveTab, moveTabs } from '../model/tabOperations'
 import { searchTabs } from '../tabs/searchTabs'
 import { readTabDragPayload } from '../tabs/tabDrag'
 import { NewGroupDialog } from './NewGroupDialog'
@@ -72,7 +72,10 @@ export const Workspace = memo(function Workspace({
     [activeSpaceId, document.groups],
   )
   const activeTabs = useMemo(
-    () => document.tabs.filter(({ spaceId }) => spaceId === activeSpaceId),
+    () =>
+      document.tabs.filter(
+        ({ spaceId, collected }) => spaceId === activeSpaceId && collected,
+      ),
     [activeSpaceId, document.tabs],
   )
   const filteredTabs = useMemo(
@@ -187,11 +190,10 @@ export const Workspace = memo(function Workspace({
     onSelectionCountChange?.(0)
   }
 
-  const removeCardFromGroup = useCallback((tabId: string) => {
-    void updateDocument((current) => {
-      const tab = current.tabs.find(({ id }) => id === tabId)
-      return tab ? moveTab(current, tabId, tab.spaceId) : current
-    }).catch(() => onError('TabSpace could not remove that tab from its group.'))
+  const deleteCard = useCallback((tabId: string) => {
+    void updateDocument((current) => deleteTabCard(current, tabId)).catch(() =>
+      onError('TabSpace could not delete that bookmark card.'),
+    )
   }, [onError, updateDocument])
 
   function card(tab: TabRecord) {
@@ -201,7 +203,7 @@ export const Workspace = memo(function Workspace({
         tab={tab}
         updateDocument={updateDocument}
         onError={onError}
-        onRemoveFromGroup={removeCardFromGroup}
+        onDeleteCard={deleteCard}
         selected={selectedIds.has(tab.id)}
         onSelect={selectTab}
         dense={dense}
@@ -231,6 +233,19 @@ export const Workspace = memo(function Workspace({
             />
             {query ? <button className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-white" onClick={() => setQuery('')} aria-label="Clear search" type="button"><X className="size-3.5" /></button> : null}
           </label>
+          <div
+            className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs transition ${dropTarget === 'collect-ungrouped' ? 'border-violet-300 bg-violet-400/15 text-violet-100 ring-2 ring-violet-400/20' : 'border-dashed border-white/15 text-zinc-500'}`}
+            role="region"
+            aria-label="Collect tab as Ungrouped drop area"
+            onDragEnter={(event) => { event.preventDefault(); setDropTarget('collect-ungrouped') }}
+            onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = 'move' }}
+            onDragLeave={clearDropTarget}
+            onDrop={(event) => moveDroppedTab(event)}
+            title="Drag an open sidebar tab here to collect it without a group"
+          >
+            <Layers3 className="size-3.5" />
+            {dropTarget === 'collect-ungrouped' ? 'Drop to collect' : 'Collect ungrouped'}
+          </div>
           <button
             className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition ${dropTarget === 'new-group' ? 'border-violet-300 bg-violet-400 text-white ring-2 ring-violet-400/30' : 'border-violet-500 bg-violet-500 hover:bg-violet-400'}`}
             onClick={() => setShowNewGroup(true)}
@@ -293,7 +308,7 @@ export const Workspace = memo(function Workspace({
             )
           })}
 
-          {(!deferredQuery || ungroupedTabs.length) ? (
+          {ungroupedTabs.length ? (
             <section
               className={`overflow-hidden rounded-2xl border bg-white/[0.012] transition [contain-intrinsic-size:auto_24rem] [content-visibility:auto] ${dropTarget === 'ungrouped' ? 'border-violet-400/70 bg-violet-400/8 ring-2 ring-violet-400/20' : 'border-white/8'}`}
               aria-label="Ungrouped tabs drop area"

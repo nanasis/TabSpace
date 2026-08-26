@@ -61,12 +61,14 @@ export function createBackup(document: TabSpaceDocument, exportedAt = new Date()
             name: group.name,
             color: group.color,
             tabs: document.tabs
-              .filter(({ groupId }) => groupId === group.id)
+              .filter(({ groupId, collected }) => groupId === group.id && collected)
               .sort((left, right) => left.order - right.order)
               .map(backupTab),
           })),
         ungroupedTabs: document.tabs
-          .filter((tab) => tab.spaceId === space.id && tab.groupId === undefined)
+          .filter(
+            (tab) => tab.spaceId === space.id && tab.groupId === undefined && tab.collected,
+          )
           .sort((left, right) => left.order - right.order)
           .map(backupTab),
       })),

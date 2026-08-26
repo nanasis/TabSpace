@@ -11,6 +11,7 @@ const tab: TabRecord = {
   alias: 'Reference',
   pinned: false,
   active: false,
+  collected: true,
   order: 0,
   lastAccessedAt: '2026-08-25T12:00:00.000Z',
   createdAt: '2026-08-25T12:00:00.000Z',

@@ -21,6 +21,7 @@ function groupedTabs(document: TabSpaceDocument) {
     else groupsBySpace.set(group.spaceId, [group])
   })
   document.tabs.forEach((tab) => {
+    if (!tab.collected) return
     if (tab.groupId) {
       const tabs = tabsByGroup.get(tab.groupId)
       if (tabs) tabs.push(tab)

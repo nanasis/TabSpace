@@ -58,6 +58,7 @@ export function moveTabs(
     if (!movedTabIds.has(tab.id)) return tab
     const movedTab = {
       ...tab,
+      collected: true,
       spaceId: destinationSpaceId,
       groupId: destinationGroupId,
       order: destinationOrder,
@@ -66,6 +67,30 @@ export function moveTabs(
     destinationOrder += 1
     return movedTab
   })
+
+  return tabSpaceDocumentSchema.parse({ ...document, tabs, updatedAt })
+}
+
+export function deleteTabCard(
+  document: TabSpaceDocument,
+  tabId: string,
+  updatedAt = new Date().toISOString(),
+) {
+  const tab = document.tabs.find(({ id }) => id === tabId)
+  if (!tab) return document
+
+  const tabs = tab.chromeTabId === undefined
+    ? document.tabs.filter(({ id }) => id !== tabId)
+    : document.tabs.map((candidate) =>
+        candidate.id === tabId
+          ? {
+              ...candidate,
+              collected: false,
+              groupId: undefined,
+              updatedAt,
+            }
+          : candidate,
+      )
 
   return tabSpaceDocumentSchema.parse({ ...document, tabs, updatedAt })
 }

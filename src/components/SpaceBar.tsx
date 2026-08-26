@@ -21,7 +21,8 @@ export const SpaceBar = memo(function SpaceBar({ document, updateDocument, onErr
   const countsBySpace = useMemo(() => {
     const counts = new Map<string, { tabs: number; groups: number }>()
     document.spaces.forEach(({ id }) => counts.set(id, { tabs: 0, groups: 0 }))
-    document.tabs.forEach(({ spaceId }) => {
+    document.tabs.forEach(({ spaceId, collected }) => {
+      if (!collected) return
       const countsForSpace = counts.get(spaceId)
       if (countsForSpace) countsForSpace.tabs += 1
     })

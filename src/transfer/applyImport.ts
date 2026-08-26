@@ -64,6 +64,7 @@ export function applyImport(
           ...(faviconUrl ? { faviconUrl } : {}),
           pinned: false,
           active: false,
+          collected: true,
           order: tabIndex,
           lastAccessedAt: updatedAt,
           createdAt: updatedAt,
@@ -132,6 +133,7 @@ export function applyImport(
         tabs.push({
           ...openTab,
           id: nextTabId,
+          collected: false,
           spaceId: firstImportedSpaceId,
           groupId: undefined,
           order: ungroupedOrder,

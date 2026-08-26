@@ -15,7 +15,7 @@ export interface TabCardProps {
   tab: TabRecord
   updateDocument(transform: (document: TabSpaceDocument) => TabSpaceDocument): Promise<void>
   onError(message: string): void
-  onRemoveFromGroup(tabId: string): void
+  onDeleteCard(tabId: string): void
   selected?: boolean
   onSelect?(tabId: string, event: MouseEvent<HTMLButtonElement>): void
   dense?: boolean
@@ -44,7 +44,7 @@ export const TabCard = memo(function TabCard({
   tab,
   updateDocument,
   onError,
-  onRemoveFromGroup,
+  onDeleteCard,
   selected,
   onSelect,
   dense,
@@ -110,17 +110,15 @@ export const TabCard = memo(function TabCard({
           <span className="block truncate text-sm font-medium text-zinc-200">{tab.alias ?? tab.title}</span>
           <span className="mt-1 block truncate text-xs text-zinc-600">{domainFor(tab.url)}</span>
         </button>
-        {tab.groupId ? (
-          <button
-            className="text-zinc-700 opacity-0 transition hover:text-amber-300 group-hover:opacity-100 focus:opacity-100"
-            onClick={() => onRemoveFromGroup(tab.id)}
-            aria-label={`Remove ${tab.alias ?? tab.title} from group`}
-            title="Remove this card from its group and move it to Ungrouped"
-            type="button"
-          >
-            <X className="size-4" />
-          </button>
-        ) : null}
+        <button
+          className="text-zinc-700 opacity-0 transition hover:text-red-300 group-hover:opacity-100 focus:opacity-100"
+          onClick={() => onDeleteCard(tab.id)}
+          aria-label={`Delete ${tab.alias ?? tab.title} card`}
+          title="Delete this bookmark card without closing the browser tab"
+          type="button"
+        >
+          <X className="size-4" />
+        </button>
       </div>
 
       <div className="mt-4 flex items-center gap-1.5">

@@ -97,6 +97,34 @@ describe('workspace components', () => {
     expect(transform(document).tabs[0]?.groupId).toBe('target-group')
   })
 
+  it('collects an open sidebar tab as Ungrouped only after an explicit drop', () => {
+    const initial = initialDocument()
+    const document = tabSpaceDocumentSchema.parse({
+      ...initial,
+      tabs: [{
+        id: 'open-tab', chromeTabId: 10, windowId: 1, spaceId: 'space-1',
+        url: 'https://open.example', title: 'Open tab', pinned: false, active: false,
+        order: 0, lastAccessedAt: NOW, createdAt: NOW, updatedAt: NOW,
+      }],
+    })
+    const updateDocument = vi.fn().mockResolvedValue(undefined)
+    const dataTransfer = createDataTransfer()
+    render(<><Sidebar document={document} currentWindowId={1} onActionError={vi.fn()} /><Workspace document={document} updateDocument={updateDocument} onError={vi.fn()} /></>)
+
+    expect(screen.queryByRole('region', { name: 'Ungrouped tabs drop area' })).not.toBeInTheDocument()
+    fireEvent.dragStart(screen.getByTitle('Drag to a group in the workspace'), { dataTransfer })
+    fireEvent.drop(screen.getByRole('region', { name: 'Collect tab as Ungrouped drop area' }), {
+      dataTransfer,
+    })
+
+    const collect = updateDocument.mock.calls[0]?.[0] as (
+      value: typeof document,
+    ) => typeof document
+    expect(collect(document).tabs[0]).toEqual(
+      expect.objectContaining({ collected: true, groupId: undefined }),
+    )
+  })
+
   it('drags a tab card from one group to another', () => {
     let id = 0
     const imported = applyImport(
@@ -150,11 +178,13 @@ describe('workspace components', () => {
     expect(screen.queryByRole('button', { name: 'Copy tab URL' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Choose destination for Example' })).not.toBeInTheDocument()
 
-    await user.click(screen.getByRole('button', { name: 'Remove Example from group' }))
-    const removeFromGroup = updateDocument.mock.calls[0]?.[0] as (
+    await user.click(screen.getByRole('button', { name: 'Delete Example card' }))
+    const deleteCard = updateDocument.mock.calls[0]?.[0] as (
       value: typeof document,
     ) => typeof document
-    expect(removeFromGroup(document).tabs[0]?.groupId).toBeUndefined()
+    const deleted = deleteCard(document)
+    expect(deleted.tabs).toEqual([])
+    expect(deleted.tabs.some(({ groupId }) => groupId === undefined)).toBe(false)
 
     await user.type(screen.getByRole('textbox', { name: 'Search tabs' }), 'missing')
     expect(screen.getByText(/No tabs match/)).toBeInTheDocument()

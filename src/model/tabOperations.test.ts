@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import { createDefaultDocument, tabSpaceDocumentSchema } from './document'
 import { createGroup } from './groupOperations'
-import { moveTab, moveTabs, updateTab } from './tabOperations'
+import { deleteTabCard, moveTab, moveTabs, updateTab } from './tabOperations'
 
 const NOW = '2026-08-25T12:00:00.000Z'
 
@@ -55,6 +55,30 @@ describe('tab operations', () => {
 
     expect(grouped.tabs[0]?.groupId).toBe('group-1')
     expect(ungrouped.tabs[0]?.groupId).toBeUndefined()
+  })
+
+  it('deletes an open card without closing its sidebar tab record', () => {
+    const grouped = moveTab(populatedDocument(), 'tab-1', 'space-1', 'group-1', NOW)
+
+    const result = deleteTabCard(grouped, 'tab-1', NOW)
+
+    expect(result.tabs[0]).toEqual(
+      expect.objectContaining({
+        chromeTabId: 10,
+        collected: false,
+        groupId: undefined,
+      }),
+    )
+  })
+
+  it('fully deletes a closed bookmark card', () => {
+    const grouped = moveTab(populatedDocument(), 'tab-1', 'space-1', 'group-1', NOW)
+    const closed = tabSpaceDocumentSchema.parse({
+      ...grouped,
+      tabs: [{ ...grouped.tabs[0], chromeTabId: undefined }],
+    })
+
+    expect(deleteTabCard(closed, 'tab-1', NOW).tabs).toEqual([])
   })
 
   it('moves multiple tabs in one validated operation', () => {

@@ -2,6 +2,15 @@
 
 All notable changes to TabSpace are documented here.
 
+## Unreleased
+
+### Changed
+
+- Keep newly opened tabs sidebar-only until explicitly collected by the user
+- Hide the Ungrouped collection until it contains explicitly collected cards
+- Delete bookmark cards without closing live browser tabs or moving them to Ungrouped
+- Exclude sidebar-only runtime records from search, counts, backups, and exports
+
 ## [0.1.1] - 2026-08-26
 
 ### Added

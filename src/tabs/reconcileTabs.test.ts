@@ -44,6 +44,7 @@ describe('reconcileTabs', () => {
         windowId: 2,
         spaceId: 'space-1',
         url: 'https://example.com/',
+        collected: false,
         order: 0,
       }),
     ])
@@ -78,6 +79,14 @@ describe('reconcileTabs', () => {
     )
   })
 
+  it('removes uncollected sidebar-only records when their browser tab closes', () => {
+    const opened = reconcileTabs(createDocument(), [browserTab()], options).document
+
+    const closed = reconcileTabs(opened, [], options)
+
+    expect(closed.document.tabs).toEqual([])
+  })
+
   it('keeps closed tabs as bookmarks without changing their group', () => {
     const initial = reconcileTabs(createDocument(), [browserTab()], options).document
     const organized = tabSpaceDocumentSchema.parse({
@@ -86,7 +95,7 @@ describe('reconcileTabs', () => {
         id: 'group-1', spaceId: 'space-1', name: 'Sources', color: '#8b5cf6',
         order: 0, collapsed: false, createdAt: NOW, updatedAt: NOW,
       }],
-      tabs: [{ ...initial.tabs[0], groupId: 'group-1' }],
+      tabs: [{ ...initial.tabs[0], groupId: 'group-1', collected: true }],
     })
 
     const result = reconcileTabs(organized, [], options)
@@ -112,7 +121,7 @@ describe('reconcileTabs', () => {
         id: 'group-1', spaceId: 'space-1', name: 'Sources', color: '#8b5cf6',
         order: 0, collapsed: false, createdAt: NOW, updatedAt: NOW,
       }],
-      tabs: [{ ...opened.tabs[0], groupId: 'group-1' }],
+      tabs: [{ ...opened.tabs[0], groupId: 'group-1', collected: true }],
     })
     const closed = reconcileTabs(organized, [], options).document
 

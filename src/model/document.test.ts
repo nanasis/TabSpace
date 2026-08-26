@@ -39,6 +39,36 @@ describe('TabSpace document', () => {
     expect(parsed.settings.cardDensity).toBe('compact')
   })
 
+  it('classifies legacy tabs as collected bookmarks or sidebar-only live tabs', () => {
+    const document = createDocument()
+    const tabFields = {
+      spaceId: 'space-1',
+      url: 'https://example.com',
+      title: 'Example',
+      pinned: false,
+      active: false,
+      order: 0,
+      lastAccessedAt: NOW,
+      createdAt: NOW,
+      updatedAt: NOW,
+    }
+
+    const parsed = tabSpaceDocumentSchema.parse({
+      ...document,
+      groups: [{
+        id: 'group-1', spaceId: 'space-1', name: 'Saved', color: '#8b5cf6',
+        order: 0, collapsed: false, createdAt: NOW, updatedAt: NOW,
+      }],
+      tabs: [
+        { ...tabFields, id: 'live-only', chromeTabId: 10 },
+        { ...tabFields, id: 'saved-only', order: 1 },
+        { ...tabFields, id: 'grouped', groupId: 'group-1', order: 2 },
+      ],
+    })
+
+    expect(parsed.tabs.map(({ collected }) => collected)).toEqual([false, true, true])
+  })
+
   it('rejects broken entity references', () => {
     const document = createDocument()
 

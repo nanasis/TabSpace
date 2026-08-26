@@ -111,7 +111,9 @@ describe('provider imports', () => {
     expect(merged.spaces).toHaveLength(2)
     expect(replaced.spaces).toHaveLength(1)
     expect(replaced.groups[0]?.name).toBe('Imported')
-    expect(replaced.tabs[0]?.url).toBe('https://example.com/')
+    expect(replaced.tabs[0]).toEqual(
+      expect.objectContaining({ url: 'https://example.com/', collected: true }),
+    )
   })
 })
 
@@ -121,10 +123,20 @@ describe('backup and compatible exports', () => {
     const imported = applyImport(initial, parseImport('toby', {
       lists: [{ title: 'Docs', cards: [{ title: 'Example', url: 'https://example.com' }] }],
     }), 'replace', { now: () => NOW, createId: ids() })
-    const document = updateTab(imported, imported.tabs[0]?.id ?? '', {
+    const edited = updateTab(imported, imported.tabs[0]?.id ?? '', {
       alias: 'Reference',
       avatarImage: 'data:image/png;base64,AA==',
     }, NOW)
+    const document = tabSpaceDocumentSchema.parse({
+      ...edited,
+      tabs: [
+        ...edited.tabs,
+        {
+          ...edited.tabs[0], id: 'sidebar-only', chromeTabId: 99, groupId: undefined,
+          url: 'https://not-collected.example', collected: false,
+        },
+      ],
+    })
     const backup = createBackup(document, NOW)
     const parsed = parseImport('tabspace', backup)
 
@@ -136,6 +148,7 @@ describe('backup and compatible exports', () => {
         avatarImage: 'data:image/png;base64,AA==',
       }),
     )
+    expect(JSON.stringify(backup)).not.toContain('not-collected.example')
     expect(JSON.stringify(backup)).not.toContain('chromeTabId')
     expect(JSON.stringify(backup)).not.toContain('sync')
   })

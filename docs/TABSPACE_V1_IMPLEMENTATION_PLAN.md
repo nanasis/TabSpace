@@ -360,20 +360,21 @@ A work item is not complete until all seven steps pass. Material design differen
 - [x] Split Import and Export into distinct Settings actions and focused dialogs; replace the native provider select with an aligned TabSpace/Toby/Tabme segmented control.
 - [x] Optimize large workspaces by indexing tabs and groups in linear passes, deferring search filtering, memoizing the shell/cards/destinations, removing repeated per-card destination option trees, validating bulk moves once, skipping duplicate local-storage renders, and applying browser content visibility to off-screen groups.
 - [x] Replace the ineffective Comfortable/Compact choice with functional Dense/Compact layouts: Dense consumes full GroupSpace width with dynamic auto-fill columns while preserving Compact card width, padding, and gaps; Compact preserves the previous display.
-- [x] Simplify tab cards: the top X moves grouped cards to Ungrouped without closing the browser tab, the footer contains only Edit and Pin, and hover descriptions explain each action.
+- [x] Simplify tab cards: the top X deletes the bookmark card without closing an associated browser tab, the footer contains only Edit and Pin, and hover descriptions explain each action.
 - [x] Replace tab-card prompts with an aligned Edit dialog that updates aliases and supports the default favicon, emoji icons, or locally uploaded image icons with size/type validation and backup persistence.
 - [x] Treat groups as bookmark collections: closing a browser tab only clears its live Chrome/window state, keeps the card and group assignment, removes it from the sidebar, and reconnects a reopened matching URL to the existing bookmark.
 - [x] Package and publish the first `v0.1.0` GitHub release through a tag-triggered workflow with a verified extension ZIP, SHA-256 checksum, curated notes, changelog, release installation guide, and updated GitHub Pages installation section.
 - [x] Discover and validate an existing `tabspace-backup.json` Gist when GitHub connects, persist its ID/history version, and enable direct confirmed Pull on another device without manual Gist metadata transfer.
 - [x] Package and publish `v0.1.1` with generalized version-matched release automation, cross-device Gist discovery notes, updated README installation guidance, and updated GitHub Pages release content.
+- [x] Separate live sidebar discovery from bookmark collection: new tabs remain sidebar-only until explicitly dropped onto a group, New group, or the top Collect ungrouped target; deleting a card does not create an Ungrouped card, empty Ungrouped is hidden, and hidden live records are excluded from search, counts, backups, and exports.
 
 ### Validation
 
-- `npm run validate` passes ESLint, TypeScript, 61 Vitest tests, extension and website builds, manifest reference verification, and Playwright E2E.
+- `npm run validate` passes ESLint, TypeScript, 76 Vitest tests, extension and website builds, manifest reference verification, and Playwright E2E.
 - Component tests cover open-only sidebar rendering, sidebar-to-group dragging, and group-to-group card dragging. Domain tests cover default-group creation, collision-safe naming, and atomic tab movement.
 - Release validation runs clean install, lint, type-check, tests, extension/site builds, packaging, checksum generation, and GitHub Release publication. The published `v0.1.1` release page, ZIP, and checksum returned HTTP 200; `sha256sum -c` passed and the archive contained a valid root manifest/dashboard/background worker. GitHub Pages was verified with the v0.1.1 installation content.
 - Gist client tests verify automatic account discovery, preferred Gist selection, validated backup retrieval, no-match handling, history-version updates, remote conflicts, and legacy ETag compatibility.
-- Reconciliation tests verify that closing a grouped live tab preserves its bookmark/group and that reopening the URL reuses the same record instead of creating a duplicate.
+- Reconciliation and model tests verify sidebar-only live records, explicit collection, card deletion without browser closure, removal of closed uncollected records, preservation of collected bookmarks, legacy classification, and matching-URL reconnection without duplicates.
 - Settings and component tests verify separate Import/Export actions, the tab-card Edit dialog and uploaded icon persistence, simplified card actions and group removal, Dense persistence, full-width workspace rendering, equal Compact/Dense card spacing, dynamic auto-fill columns, legacy Comfortable normalization, Compact compatibility, and single-pass bulk moves.
 - GitHub boundary tests cover successful history-version updates, remote conflicts, and legacy ETag compatibility without sending unsupported conditional PATCH headers.
 - Production build verification requires `chrome_url_overrides.newtab` to reference the built dashboard entry page.

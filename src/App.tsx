@@ -58,7 +58,9 @@ export function App({ repository }: AppProps) {
               {activeSpace ? `${activeSpace.emoji} ${activeSpace.name}` : 'TabSpace'}
             </p>
             <p className="text-xs text-zinc-500">
-              {loading ? 'Loading tabs…' : `${document?.tabs.length ?? 0} open tabs`}
+              {loading
+                ? 'Loading tabs…'
+                : `${document?.tabs.filter(({ chromeTabId }) => chromeTabId !== undefined).length ?? 0} open tabs`}
             </p>
           </div>
           <button
@@ -112,7 +114,7 @@ export function App({ repository }: AppProps) {
             {selection.spaceId === document?.settings.activeSpaceId && selection.count
               ? `${selection.count} tabs selected`
               : document
-                ? `${document.tabs.filter(({ spaceId }) => spaceId === document.settings.activeSpaceId).length} tabs in space`
+                ? `${document.tabs.filter(({ spaceId, collected }) => spaceId === document.settings.activeSpaceId && collected).length} collected tabs in space`
                 : 'Starting TabSpace'}
           </span>
           <span>Local · private</span>

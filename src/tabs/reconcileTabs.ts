@@ -103,22 +103,28 @@ export function reconcileTabs(
       .map((record) => [record.chromeTabId, record]),
   )
   let changed = false
-  const nextRecords = document.tabs.map((record) => {
-    if (record.chromeTabId === undefined || liveTabIds.has(record.chromeTabId)) return record
+  const nextRecords: TabRecord[] = []
+  document.tabs.forEach((record) => {
+    if (record.chromeTabId === undefined || liveTabIds.has(record.chromeTabId)) {
+      nextRecords.push(record)
+      return
+    }
+
     changed = true
-    return {
+    if (!record.collected) return
+    nextRecords.push({
       ...record,
       chromeTabId: undefined,
       windowId: undefined,
       active: false,
       pinned: false,
       updatedAt: timestamp,
-    }
+    })
   })
   const nextRecordIndexes = new Map(nextRecords.map((record, index) => [record.id, index]))
   const savedRecordIndexesByUrl = new Map<string, number[]>()
   nextRecords.forEach((record, index) => {
-    if (record.chromeTabId !== undefined) return
+    if (record.chromeTabId !== undefined || !record.collected) return
     const url = canonicalUrl(record.url)
     const indexes = savedRecordIndexesByUrl.get(url)
     if (indexes) indexes.push(index)
@@ -190,6 +196,7 @@ export function reconcileTabs(
       ...(tab.faviconUrl ? { faviconUrl: tab.faviconUrl } : {}),
       pinned: tab.pinned,
       active: tab.active,
+      collected: false,
       order: nextOrder,
       lastAccessedAt: nextAccessedAt,
       createdAt: timestamp,

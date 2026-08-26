@@ -48,12 +48,18 @@ export const tabRecordSchema = z
     avatarImage: z.string().startsWith('data:image/').max(262144).optional(),
     pinned: z.boolean(),
     active: z.boolean().default(false),
+    collected: z.boolean().optional(),
     order: orderSchema,
     lastAccessedAt: timestampSchema,
     createdAt: timestampSchema,
     updatedAt: timestampSchema,
   })
   .strict()
+  .transform((tab) => ({
+    ...tab,
+    collected:
+      tab.collected ?? (tab.groupId !== undefined || tab.chromeTabId === undefined),
+  }))
 
 const cardDensitySchema = z.preprocess(
   (value) => (value === 'comfortable' ? 'compact' : value),
