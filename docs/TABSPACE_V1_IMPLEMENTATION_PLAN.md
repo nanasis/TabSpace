@@ -358,14 +358,15 @@ A work item is not complete until all seven steps pass. Material design differen
 - [x] Replace unsupported `If-Match` Gist updates with explicit history-version conflict checks and migrate legacy ETag metadata on the next push.
 - [x] Add in-product and README guidance for creating a classic GitHub PAT with only the `gist` scope.
 - [x] Split Import and Export into distinct Settings actions and focused dialogs; replace the native provider select with an aligned TabSpace/Toby/Tabme segmented control.
-- [x] Optimize large workspaces by indexing tabs and groups in linear passes, deferring search filtering, memoizing the shell/cards/destinations, lazily mounting per-card destination options, validating bulk moves once, skipping duplicate local-storage renders, and applying browser content visibility to off-screen groups.
-- [x] Replace the ineffective Comfortable/Compact choice with functional Dense/Compact layouts: Dense consumes full GroupSpace width with dynamic auto-fill columns; Compact preserves the previous display.
+- [x] Optimize large workspaces by indexing tabs and groups in linear passes, deferring search filtering, memoizing the shell/cards/destinations, removing repeated per-card destination option trees, validating bulk moves once, skipping duplicate local-storage renders, and applying browser content visibility to off-screen groups.
+- [x] Replace the ineffective Comfortable/Compact choice with functional Dense/Compact layouts: Dense consumes full GroupSpace width with dynamic auto-fill columns while preserving Compact card width, padding, and gaps; Compact preserves the previous display.
+- [x] Simplify tab cards: the top X moves grouped cards to Ungrouped without closing the browser tab, the footer contains only Edit and Pin, and hover descriptions explain each action.
 
 ### Validation
 
 - `npm run validate` passes ESLint, TypeScript, 61 Vitest tests, extension and website builds, manifest reference verification, and Playwright E2E.
 - Component tests cover open-only sidebar rendering, sidebar-to-group dragging, and group-to-group card dragging. Domain tests cover default-group creation, collision-safe naming, and atomic tab movement.
-- Settings and component tests verify separate Import/Export actions, lazy card destination controls, Dense persistence, full-width workspace rendering, dynamic auto-fill card columns, legacy Comfortable normalization, Compact compatibility, and single-pass bulk moves.
+- Settings and component tests verify separate Import/Export actions, simplified card actions and group removal, Dense persistence, full-width workspace rendering, equal Compact/Dense card spacing, dynamic auto-fill columns, legacy Comfortable normalization, Compact compatibility, and single-pass bulk moves.
 - GitHub boundary tests cover successful history-version updates, remote conflicts, and legacy ETag compatibility without sending unsupported conditional PATCH headers.
 - Production build verification requires `chrome_url_overrides.newtab` to reference the built dashboard entry page.
 - Import tests cover Tabme direct items, nested group items, favicon fallback, and Replace behavior for matched and unmatched open tabs. A safe count-only parse and canonical-model application against the supplied Toby account export produced 1 space, 2 groups, 4 validated tabs, 4 favicon values, and 0 skipped records. Sidebar coverage verifies current-window filtering across multiple TabSpace spaces, and E2E verifies successful import dismissal. A shape-only check against a real Tabme backup produced 1 space, 28 groups, and 259 tabs with 259 favicon values and no skipped records; no private titles or URLs were logged or retained.

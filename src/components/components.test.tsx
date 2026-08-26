@@ -135,12 +135,26 @@ describe('workspace components', () => {
       { now: () => NOW, createId: () => `id-${++id}` },
     )
 
-    render(<Workspace document={document} updateDocument={vi.fn()} onError={vi.fn()} />)
+    const updateDocument = vi.fn().mockResolvedValue(undefined)
+    render(<Workspace document={document} updateDocument={updateDocument} onError={vi.fn()} />)
     expect(screen.getByRole('heading', { name: 'Sources' })).toBeInTheDocument()
     expect(screen.getByText('Example')).toBeInTheDocument()
-    expect(screen.queryByRole('combobox', { name: 'Move Example' })).not.toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Choose destination for Example' }))
-    expect(screen.getByRole('combobox', { name: 'Move Example' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Edit Example' })).toHaveAttribute(
+      'title',
+      'Edit the tab alias',
+    )
+    expect(screen.getByRole('button', { name: 'Pin tab' })).toHaveAttribute(
+      'title',
+      'Pin this tab in Chrome',
+    )
+    expect(screen.queryByRole('button', { name: 'Copy tab URL' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Choose destination for Example' })).not.toBeInTheDocument()
+
+    await user.click(screen.getByRole('button', { name: 'Remove Example from group' }))
+    const removeFromGroup = updateDocument.mock.calls[0]?.[0] as (
+      value: typeof document,
+    ) => typeof document
+    expect(removeFromGroup(document).tabs[0]?.groupId).toBeUndefined()
 
     await user.type(screen.getByRole('textbox', { name: 'Search tabs' }), 'missing')
     expect(screen.getByText(/No tabs match/)).toBeInTheDocument()
@@ -164,7 +178,7 @@ describe('workspace components', () => {
     render(<Workspace document={denseDocument} updateDocument={vi.fn()} onError={vi.fn()} />)
 
     expect(document.querySelector('[data-card-layout="dense"]')).toHaveClass(
-      '[grid-template-columns:repeat(auto-fill,minmax(13rem,1fr))]',
+      '[grid-template-columns:repeat(auto-fill,minmax(17rem,1fr))]',
     )
     expect(screen.getByText('Example').closest('article')).toHaveAttribute('data-density', 'dense')
   })

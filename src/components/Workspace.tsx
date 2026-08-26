@@ -33,7 +33,14 @@ import { moveTab, moveTabs } from '../model/tabOperations'
 import { searchTabs } from '../tabs/searchTabs'
 import { readTabDragPayload } from '../tabs/tabDrag'
 import { NewGroupDialog } from './NewGroupDialog'
-import { TabCard, type MoveDestination } from './TabCard'
+import { TabCard } from './TabCard'
+
+interface MoveDestination {
+  value: string
+  label: string
+  spaceId: string
+  groupId?: string
+}
 
 export interface WorkspaceProps {
   document: TabSpaceDocument
@@ -103,7 +110,7 @@ export const Workspace = memo(function Workspace({
   }, [document.groups, document.spaces])
   const dense = document.settings.cardDensity === 'dense'
   const cardGridClass = dense
-    ? 'grid gap-2 p-3 [grid-template-columns:repeat(auto-fill,minmax(13rem,1fr))]'
+    ? 'grid gap-3 p-4 [grid-template-columns:repeat(auto-fill,minmax(17rem,1fr))]'
     : 'grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'
 
   function moveDroppedTab(event: DragEvent<HTMLElement>, groupId?: string) {
@@ -180,21 +187,21 @@ export const Workspace = memo(function Workspace({
     onSelectionCountChange?.(0)
   }
 
-  const moveCard = useCallback((tabId: string, target: MoveDestination) => {
-    void updateDocument((current) =>
-      moveTab(current, tabId, target.spaceId, target.groupId),
-    )
-  }, [updateDocument])
+  const removeCardFromGroup = useCallback((tabId: string) => {
+    void updateDocument((current) => {
+      const tab = current.tabs.find(({ id }) => id === tabId)
+      return tab ? moveTab(current, tabId, tab.spaceId) : current
+    }).catch(() => onError('TabSpace could not remove that tab from its group.'))
+  }, [onError, updateDocument])
 
   function card(tab: TabRecord) {
     return (
       <TabCard
         key={tab.id}
         tab={tab}
-        moveDestinations={moveDestinations}
         updateDocument={updateDocument}
         onError={onError}
-        onMove={moveCard}
+        onRemoveFromGroup={removeCardFromGroup}
         selected={selectedIds.has(tab.id)}
         onSelect={selectTab}
         dense={dense}
