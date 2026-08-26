@@ -23,9 +23,20 @@ describe('TabSpace document', () => {
       spaces: [{ id: 'space-1', name: 'My Space', emoji: '✨', order: 0 }],
       groups: [],
       tabs: [],
-      settings: { activeSpaceId: 'space-1' },
+      settings: { activeSpaceId: 'space-1', cardDensity: 'compact' },
       sync: {},
     })
+  })
+
+  it('normalizes the legacy comfortable density to compact', () => {
+    const document = createDocument()
+
+    const parsed = tabSpaceDocumentSchema.parse({
+      ...document,
+      settings: { ...document.settings, cardDensity: 'comfortable' },
+    })
+
+    expect(parsed.settings.cardDensity).toBe('compact')
   })
 
   it('rejects broken entity references', () => {

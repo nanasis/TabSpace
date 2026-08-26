@@ -34,13 +34,14 @@ describe('App', () => {
 
     await user.click(screen.getByRole('button', { name: 'Settings' }))
     expect(screen.getByRole('dialog', { name: 'Settings' })).toBeInTheDocument()
-    await user.click(screen.getByRole('radio', { name: 'compact' }))
+    await user.click(screen.getByRole('radio', { name: /dense/i }))
 
     await waitFor(() =>
       expect(repository.save).toHaveBeenCalledWith(
-        expect.objectContaining({ settings: expect.objectContaining({ cardDensity: 'compact' }) }),
+        expect.objectContaining({ settings: expect.objectContaining({ cardDensity: 'dense' }) }),
       ),
     )
+    expect(document.querySelector('[data-workspace-width="dense"]')).toBeInTheDocument()
 
     await user.keyboard('{Escape}')
     expect(screen.queryByRole('dialog', { name: 'Settings' })).not.toBeInTheDocument()

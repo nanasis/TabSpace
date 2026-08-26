@@ -54,10 +54,15 @@ export const tabRecordSchema = z
   })
   .strict()
 
+const cardDensitySchema = z.preprocess(
+  (value) => (value === 'comfortable' ? 'compact' : value),
+  z.enum(['dense', 'compact']).default('compact'),
+)
+
 export const settingsSchema = z
   .object({
     activeSpaceId: idSchema,
-    cardDensity: z.enum(['comfortable', 'compact']).default('comfortable'),
+    cardDensity: cardDensitySchema,
   })
   .strict()
 

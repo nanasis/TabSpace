@@ -18,7 +18,7 @@ export interface TabCardProps {
   onError(message: string): void
   selected?: boolean
   onSelect?(event: MouseEvent<HTMLButtonElement>): void
-  compact?: boolean
+  dense?: boolean
 }
 
 function domainFor(url: string) {
@@ -40,7 +40,7 @@ function relativeAccess(timestamp: string) {
   return `${Math.floor(hours / 24)}d ago`
 }
 
-export function TabCard({ tab, document, updateDocument, onError, selected, onSelect, compact }: TabCardProps) {
+export function TabCard({ tab, document, updateDocument, onError, selected, onSelect, dense }: TabCardProps) {
   async function open() {
     try {
       if (tab.chromeTabId === undefined) await openBrowserTab(tab.url)
@@ -91,7 +91,8 @@ export function TabCard({ tab, document, updateDocument, onError, selected, onSe
 
   return (
     <article
-      className={`group relative min-w-0 cursor-grab rounded-xl border bg-[#15151b] ${compact ? 'p-2.5' : 'p-3.5'} transition hover:-translate-y-0.5 hover:border-white/16 hover:bg-[#181820] active:cursor-grabbing ${selected ? 'border-violet-400/60 ring-1 ring-violet-400/30' : tab.active ? 'border-violet-400/35 shadow-lg shadow-violet-950/10' : 'border-white/8'}`}
+      className={`group relative min-w-0 cursor-grab rounded-xl border bg-[#15151b] ${dense ? 'p-2.5' : 'p-3.5'} transition hover:-translate-y-0.5 hover:border-white/16 hover:bg-[#181820] active:cursor-grabbing ${selected ? 'border-violet-400/60 ring-1 ring-violet-400/30' : tab.active ? 'border-violet-400/35 shadow-lg shadow-violet-950/10' : 'border-white/8'}`}
+      data-density={dense ? 'dense' : 'compact'}
       draggable
       onDragStart={(event) =>
         writeTabDragPayload(event.dataTransfer, { tabId: tab.id, source: 'card' })

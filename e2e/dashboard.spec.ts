@@ -69,7 +69,8 @@ test('opens settings, persists density, and previews a backup import', async ({ 
 
   await page.getByRole('button', { name: 'Settings' }).click()
   await expect(page.getByRole('dialog', { name: 'Settings' })).toBeVisible()
-  await page.getByText('compact', { exact: true }).click()
+  await page.getByText('Dense', { exact: true }).click()
+  await expect(page.locator('[data-workspace-width="dense"]')).toBeVisible()
   await page.getByRole('button', { name: 'Import or export data' }).click()
 
   await expect(page.getByRole('dialog', { name: 'Import & export' })).toBeVisible()

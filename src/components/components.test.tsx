@@ -143,6 +143,29 @@ describe('workspace components', () => {
     expect(screen.getByText(/No tabs match/)).toBeInTheDocument()
   })
 
+  it('uses a full-width auto-filling grid in dense mode', () => {
+    let id = 0
+    const compactDocument = applyImport(
+      initialDocument(),
+      parseImport('toby', {
+        lists: [{ title: 'Sources', cards: [{ title: 'Example', url: 'https://example.com' }] }],
+      }),
+      'replace',
+      { now: () => NOW, createId: () => `dense-${++id}` },
+    )
+    const denseDocument = tabSpaceDocumentSchema.parse({
+      ...compactDocument,
+      settings: { ...compactDocument.settings, cardDensity: 'dense' },
+    })
+
+    render(<Workspace document={denseDocument} updateDocument={vi.fn()} onError={vi.fn()} />)
+
+    expect(document.querySelector('[data-card-layout="dense"]')).toHaveClass(
+      '[grid-template-columns:repeat(auto-fill,minmax(13rem,1fr))]',
+    )
+    expect(screen.getByText('Example').closest('article')).toHaveAttribute('data-density', 'dense')
+  })
+
   it('creates a space through the space toolbar', async () => {
     const user = userEvent.setup()
     const updateDocument = vi.fn().mockResolvedValue(undefined)

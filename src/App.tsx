@@ -73,7 +73,12 @@ export function App({ repository }: AppProps) {
         ) : null}
 
         <main className="flex-1 p-4 sm:p-7" aria-labelledby="workspace-title">
-          <div className="mx-auto max-w-7xl">
+          <div
+            className={
+              document?.settings.cardDensity === 'dense' ? 'w-full max-w-none' : 'mx-auto max-w-7xl'
+            }
+            data-workspace-width={document?.settings.cardDensity ?? 'compact'}
+          >
             {error || actionError ? (
               <div className="mb-6 rounded-xl border border-red-400/20 bg-red-400/8 px-4 py-3 text-sm text-red-200" role="alert">
                 {error ?? actionError}

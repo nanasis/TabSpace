@@ -63,9 +63,11 @@ After changing source code, rebuild and select **Reload** on the TabSpace extens
 
 New tabs enter the most recently active space as Ungrouped. The sidebar lists every currently open tab in the dashboard's Chrome window, regardless of which TabSpace space or group owns it. Drag an open sidebar tab onto a group, or onto **New group** to create a default group automatically. Tab cards can also be dragged between groups or back to Ungrouped. Use the space toolbar to create or switch spaces. Deleting a group moves its tabs to Ungrouped. Deleting a space keeps its Chrome tabs open and moves their records ungrouped to the first remaining space. The final space cannot be deleted.
 
-### Search and tab actions
+### Search, layout, and tab actions
 
 Search matches aliases, titles, domains, and URLs. Card controls activate/open, close, pin, copy, rename, change the avatar, or move a tab. Use the selection control on a card with Ctrl/Cmd or Shift for bulk movement.
+
+Under **Settings → Tab card density**, choose **Dense** to use the full GroupSpace width and dynamically fit as many cards per row as the screen allows. Choose **Compact** to retain the original bounded responsive layout. Existing `comfortable` settings are migrated to Compact automatically.
 
 ### Import and export
 

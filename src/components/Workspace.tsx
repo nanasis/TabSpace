@@ -50,7 +50,10 @@ export function Workspace({ document, updateDocument, onError, onSelectionCountC
   const filteredTabs = useMemo(() => searchTabs(activeTabs, query), [activeTabs, query])
   const filteredIds = new Set(filteredTabs.map(({ id }) => id))
   const ungroupedTabs = filteredTabs.filter(({ groupId }) => groupId === undefined)
-
+  const dense = document.settings.cardDensity === 'dense'
+  const cardGridClass = dense
+    ? 'grid gap-2 p-3 [grid-template-columns:repeat(auto-fill,minmax(13rem,1fr))]'
+    : 'grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'
 
   function moveDroppedTab(event: DragEvent<HTMLElement>, groupId?: string) {
     event.preventDefault()
@@ -138,7 +141,7 @@ export function Workspace({ document, updateDocument, onError, onSelectionCountC
         onError={onError}
         selected={selectedIds.has(tab.id)}
         onSelect={(event) => selectTab(tab.id, event)}
-        compact={document.settings.cardDensity === 'compact'}
+        dense={dense}
       />
     )
   }
@@ -221,7 +224,7 @@ export function Workspace({ document, updateDocument, onError, onSelectionCountC
                   <button className="icon-button" onClick={() => editGroup(group.id, group.name, group.color)} aria-label={`Edit ${group.name}`} type="button"><MoreHorizontal className="size-3.5" /></button>
                   <button className="icon-button hover:text-red-300" onClick={() => removeGroup(group.id, group.name)} aria-label={`Delete ${group.name}`} type="button"><Trash2 className="size-3.5" /></button>
                 </div>
-                {!group.collapsed ? tabs.length ? <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">{tabs.map(card)}</div> : <div className="p-6 text-center text-xs text-zinc-600">Move tabs here to start this group.</div> : null}
+                {!group.collapsed ? tabs.length ? <div className={cardGridClass} data-card-layout={dense ? 'dense' : 'compact'}>{tabs.map(card)}</div> : <div className="p-6 text-center text-xs text-zinc-600">Move tabs here to start this group.</div> : null}
               </section>
             )
           })}
@@ -236,7 +239,7 @@ export function Workspace({ document, updateDocument, onError, onSelectionCountC
               onDrop={(event) => moveDroppedTab(event)}
             >
               <div className="flex items-center gap-3 border-b border-white/7 px-4 py-3"><span className="size-2 rounded-full bg-zinc-700" /><h3 className="flex-1 text-sm font-medium text-zinc-300">Ungrouped</h3><span className="font-mono text-[10px] text-zinc-600">{ungroupedTabs.length}</span></div>
-              {ungroupedTabs.length ? <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">{ungroupedTabs.map(card)}</div> : <div className="grid min-h-32 place-items-center p-4 text-center text-xs text-zinc-600"><span><Layers3 className="mx-auto mb-2 size-5 text-zinc-700" />No ungrouped tabs.</span></div>}
+              {ungroupedTabs.length ? <div className={cardGridClass} data-card-layout={dense ? 'dense' : 'compact'}>{ungroupedTabs.map(card)}</div> : <div className="grid min-h-32 place-items-center p-4 text-center text-xs text-zinc-600"><span><Layers3 className="mx-auto mb-2 size-5 text-zinc-700" />No ungrouped tabs.</span></div>}
             </section>
           ) : null}
         </div>

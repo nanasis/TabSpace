@@ -40,22 +40,36 @@ export function SettingsDialog({ document, onChange, onClose, onOpenDataTransfer
         <div className="space-y-6 p-5">
           <fieldset>
             <legend className="text-sm font-medium">Tab card density</legend>
-            <p className="mt-1 text-xs text-zinc-500">Choose how much room cards use in the workspace.</p>
+            <p className="mt-1 text-xs text-zinc-500">Choose how cards use the available GroupSpace width.</p>
             <div className="mt-3 grid grid-cols-2 gap-2">
-              {(['comfortable', 'compact'] as const).map((density) => (
+              {([
+                {
+                  value: 'dense',
+                  label: 'Dense',
+                  description: 'Use the full workspace width and fit as many cards per row as the screen allows.',
+                },
+                {
+                  value: 'compact',
+                  label: 'Compact',
+                  description: 'Keep the current bounded workspace and responsive card layout.',
+                },
+              ] as const).map((option) => (
                 <label
-                  key={density}
-                  className={`cursor-pointer rounded-xl border px-3 py-3 text-xs capitalize transition ${document.settings.cardDensity === density ? 'border-violet-400/40 bg-violet-400/10 text-violet-100' : 'border-white/8 text-zinc-400 hover:border-white/15'}`}
+                  key={option.value}
+                  className={`cursor-pointer rounded-xl border px-3 py-3 transition ${document.settings.cardDensity === option.value ? 'border-violet-400/40 bg-violet-400/10 text-violet-100' : 'border-white/8 text-zinc-400 hover:border-white/15'}`}
                 >
                   <input
                     className="sr-only"
                     type="radio"
                     name="card-density"
-                    value={density}
-                    checked={document.settings.cardDensity === density}
-                    onChange={() => onChange({ cardDensity: density })}
+                    value={option.value}
+                    checked={document.settings.cardDensity === option.value}
+                    onChange={() => onChange({ cardDensity: option.value })}
                   />
-                  {density}
+                  <span className="block text-xs font-medium">{option.label}</span>
+                  <span className="mt-1 block text-[10px] leading-4 text-zinc-500">
+                    {option.description}
+                  </span>
                 </label>
               ))}
             </div>
