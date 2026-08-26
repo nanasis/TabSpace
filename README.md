@@ -71,7 +71,7 @@ Under **Settings → Tab card density**, choose **Dense** to use the full GroupS
 
 ### Import and export
 
-Open **Settings → Import or export data**. Choose the provider before selecting or dropping a JSON file; TabSpace intentionally does not guess the provider.
+Open **Settings → Import data**. Choose TabSpace, Toby, or Tabme from the styled provider bar before selecting or dropping a JSON file; TabSpace intentionally does not guess the provider. Use the separate **Settings → Export data** action when downloading backups or compatible formats.
 
 - **Toby:** organization, account, and list-array JSON exports using collections (`lists`) and links (`cards`)
 - **Tabme:** backup profile using spaces, folders/collections, and `items`; direct links and nested `groupItems` are flattened into their containing TabSpace group. See the sanitized fixture at `src/transfer/fixtures/tabme-backup.json`

@@ -34,6 +34,8 @@ describe('App', () => {
 
     await user.click(screen.getByRole('button', { name: 'Settings' }))
     expect(screen.getByRole('dialog', { name: 'Settings' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Import data' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Export data' })).toBeInTheDocument()
     await user.click(screen.getByRole('radio', { name: /dense/i }))
 
     await waitFor(() =>

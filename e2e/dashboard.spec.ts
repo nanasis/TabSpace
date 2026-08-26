@@ -71,9 +71,12 @@ test('opens settings, persists density, and previews a backup import', async ({ 
   await expect(page.getByRole('dialog', { name: 'Settings' })).toBeVisible()
   await page.getByText('Dense', { exact: true }).click()
   await expect(page.locator('[data-workspace-width="dense"]')).toBeVisible()
-  await page.getByRole('button', { name: 'Import or export data' }).click()
+  await page.getByRole('button', { name: 'Import data' }).click()
 
-  await expect(page.getByRole('dialog', { name: 'Import & export' })).toBeVisible()
+  await expect(page.getByRole('dialog', { name: 'Import data' })).toBeVisible()
+  await expect(page.getByRole('radio', { name: /TabSpace Full backup/i })).toBeChecked()
+  await expect(page.getByRole('radio', { name: /Toby Collections/i })).toBeVisible()
+  await expect(page.getByRole('radio', { name: /Tabme Spaces & folders/i })).toBeVisible()
   await page.locator('input[type="file"]').setInputFiles({
     name: 'tabspace-backup.json',
     mimeType: 'application/json',
@@ -81,5 +84,5 @@ test('opens settings, persists density, and previews a backup import', async ({ 
   })
   await expect(page.getByText(/Ready to import 1 spaces, 0 groups, and 1 tabs/)).toBeVisible()
   await page.getByRole('button', { name: 'Import', exact: true }).click()
-  await expect(page.getByRole('dialog', { name: 'Import & export' })).toBeHidden()
+  await expect(page.getByRole('dialog', { name: 'Import data' })).toBeHidden()
 })

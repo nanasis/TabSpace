@@ -2,7 +2,10 @@ import { Settings2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 
 import { useTabSpaceDocument } from './app/useTabSpaceDocument'
-import { ImportExportDialog } from './components/ImportExportDialog'
+import {
+  ImportExportDialog,
+  type DataTransferView,
+} from './components/ImportExportDialog'
 import { SettingsDialog } from './components/SettingsDialog'
 import { Sidebar } from './components/Sidebar'
 import { SpaceBar } from './components/SpaceBar'
@@ -26,7 +29,7 @@ export function App({ repository }: AppProps) {
   const [actionError, setActionError] = useState<string>()
   const [selection, setSelection] = useState({ spaceId: '', count: 0 })
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const [transferOpen, setTransferOpen] = useState(false)
+  const [transferView, setTransferView] = useState<DataTransferView>()
   const [currentWindowId, setCurrentWindowId] = useState<number>()
   const activeSpace = document?.spaces.find(({ id }) => id === document.settings.activeSpaceId)
 
@@ -118,19 +121,24 @@ export function App({ repository }: AppProps) {
           document={document}
           onChange={(updates) => void updateDocument((current) => updateSettings(current, updates))}
           onClose={() => setSettingsOpen(false)}
-          onOpenDataTransfer={() => {
+          onOpenImport={() => {
             setSettingsOpen(false)
-            setTransferOpen(true)
+            setTransferView('import')
+          }}
+          onOpenExport={() => {
+            setSettingsOpen(false)
+            setTransferView('export')
           }}
           updateDocument={updateDocument}
         />
       ) : null}
 
-      {transferOpen && document ? (
+      {transferView && document ? (
         <ImportExportDialog
           document={document}
+          view={transferView}
           updateDocument={updateDocument}
-          onClose={() => setTransferOpen(false)}
+          onClose={() => setTransferView(undefined)}
         />
       ) : null}
     </div>

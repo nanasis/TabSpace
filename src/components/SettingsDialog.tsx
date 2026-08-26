@@ -1,4 +1,4 @@
-import { Database, GitBranch, Import, ShieldCheck, X } from 'lucide-react'
+import { Database, Download, GitBranch, ShieldCheck, Upload, X } from 'lucide-react'
 import type { Settings, TabSpaceDocument } from '../model/document'
 import { GistSyncSection } from './GistSyncSection'
 import { useDialogFocus } from './useDialogFocus'
@@ -7,11 +7,19 @@ export interface SettingsDialogProps {
   document: TabSpaceDocument
   onChange(updates: Partial<Settings>): void
   onClose(): void
-  onOpenDataTransfer(): void
+  onOpenImport(): void
+  onOpenExport(): void
   updateDocument(transform: (document: TabSpaceDocument) => TabSpaceDocument): Promise<void>
 }
 
-export function SettingsDialog({ document, onChange, onClose, onOpenDataTransfer, updateDocument }: SettingsDialogProps) {
+export function SettingsDialog({
+  document,
+  onChange,
+  onClose,
+  onOpenImport,
+  onOpenExport,
+  updateDocument,
+}: SettingsDialogProps) {
   const dialogRef = useDialogFocus<HTMLElement>(onClose)
 
   return (
@@ -80,7 +88,22 @@ export function SettingsDialog({ document, onChange, onClose, onOpenDataTransfer
             <p className="mt-2 text-xs leading-5 text-zinc-500">
               {document.spaces.length} spaces, {document.groups.length} groups, and {document.tabs.length} tab records are stored in Chrome on this device.
             </p>
-            <button className="mt-3 flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs text-zinc-300 hover:border-violet-400/30" onClick={onOpenDataTransfer} type="button"><Import className="size-3.5" /> Import or export data</button>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <button
+                className="flex items-center justify-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs text-zinc-300 transition hover:border-violet-400/30 hover:bg-violet-400/5"
+                onClick={onOpenImport}
+                type="button"
+              >
+                <Upload className="size-3.5" /> Import data
+              </button>
+              <button
+                className="flex items-center justify-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs text-zinc-300 transition hover:border-violet-400/30 hover:bg-violet-400/5"
+                onClick={onOpenExport}
+                type="button"
+              >
+                <Download className="size-3.5" /> Export data
+              </button>
+            </div>
           </div>
 
           <GistSyncSection document={document} updateDocument={updateDocument} />
