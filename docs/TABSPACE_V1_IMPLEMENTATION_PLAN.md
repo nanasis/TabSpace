@@ -362,11 +362,13 @@ A work item is not complete until all seven steps pass. Material design differen
 - [x] Replace the ineffective Comfortable/Compact choice with functional Dense/Compact layouts: Dense consumes full GroupSpace width with dynamic auto-fill columns while preserving Compact card width, padding, and gaps; Compact preserves the previous display.
 - [x] Simplify tab cards: the top X moves grouped cards to Ungrouped without closing the browser tab, the footer contains only Edit and Pin, and hover descriptions explain each action.
 - [x] Replace tab-card prompts with an aligned Edit dialog that updates aliases and supports the default favicon, emoji icons, or locally uploaded image icons with size/type validation and backup persistence.
+- [x] Treat groups as bookmark collections: closing a browser tab only clears its live Chrome/window state, keeps the card and group assignment, removes it from the sidebar, and reconnects a reopened matching URL to the existing bookmark.
 
 ### Validation
 
 - `npm run validate` passes ESLint, TypeScript, 61 Vitest tests, extension and website builds, manifest reference verification, and Playwright E2E.
 - Component tests cover open-only sidebar rendering, sidebar-to-group dragging, and group-to-group card dragging. Domain tests cover default-group creation, collision-safe naming, and atomic tab movement.
+- Reconciliation tests verify that closing a grouped live tab preserves its bookmark/group and that reopening the URL reuses the same record instead of creating a duplicate.
 - Settings and component tests verify separate Import/Export actions, the tab-card Edit dialog and uploaded icon persistence, simplified card actions and group removal, Dense persistence, full-width workspace rendering, equal Compact/Dense card spacing, dynamic auto-fill columns, legacy Comfortable normalization, Compact compatibility, and single-pass bulk moves.
 - GitHub boundary tests cover successful history-version updates, remote conflicts, and legacy ETag compatibility without sending unsupported conditional PATCH headers.
 - Production build verification requires `chrome_url_overrides.newtab` to reference the built dashboard entry page.

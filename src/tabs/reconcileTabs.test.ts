@@ -78,24 +78,54 @@ describe('reconcileTabs', () => {
     )
   })
 
-  it('removes records for closed tabs but retains records without a Chrome tab ID', () => {
+  it('keeps closed tabs as bookmarks without changing their group', () => {
     const initial = reconcileTabs(createDocument(), [browserTab()], options).document
-    const withSavedRecord = tabSpaceDocumentSchema.parse({
+    const organized = tabSpaceDocumentSchema.parse({
       ...initial,
-      tabs: [
-        ...initial.tabs,
-        {
-          ...initial.tabs[0],
-          id: 'saved-tab',
-          chromeTabId: undefined,
-          order: 1,
-        },
-      ],
+      groups: [{
+        id: 'group-1', spaceId: 'space-1', name: 'Sources', color: '#8b5cf6',
+        order: 0, collapsed: false, createdAt: NOW, updatedAt: NOW,
+      }],
+      tabs: [{ ...initial.tabs[0], groupId: 'group-1' }],
     })
 
-    const result = reconcileTabs(withSavedRecord, [], options)
+    const result = reconcileTabs(organized, [], options)
 
-    expect(result.document.tabs.map(({ id }) => id)).toEqual(['saved-tab'])
+    expect(result.document.groups).toEqual(organized.groups)
+    expect(result.document.tabs).toHaveLength(1)
+    expect(result.document.tabs[0]).toEqual(
+      expect.objectContaining({
+        id: 'tab-1',
+        groupId: 'group-1',
+        chromeTabId: undefined,
+        active: false,
+        pinned: false,
+      }),
+    )
+  })
+
+  it('reattaches a reopened URL to its existing grouped bookmark', () => {
+    const opened = reconcileTabs(createDocument(), [browserTab()], options).document
+    const organized = tabSpaceDocumentSchema.parse({
+      ...opened,
+      groups: [{
+        id: 'group-1', spaceId: 'space-1', name: 'Sources', color: '#8b5cf6',
+        order: 0, collapsed: false, createdAt: NOW, updatedAt: NOW,
+      }],
+      tabs: [{ ...opened.tabs[0], groupId: 'group-1' }],
+    })
+    const closed = reconcileTabs(organized, [], options).document
+
+    const reopened = reconcileTabs(
+      closed,
+      [browserTab({ id: 42, windowId: 5 })],
+      { ...options, createId: () => 'must-not-create' },
+    ).document
+
+    expect(reopened.tabs).toHaveLength(1)
+    expect(reopened.tabs[0]).toEqual(
+      expect.objectContaining({ id: 'tab-1', groupId: 'group-1', chromeTabId: 42, windowId: 5 }),
+    )
   })
 
   it('returns the original document when browser state did not change', () => {

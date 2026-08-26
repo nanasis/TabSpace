@@ -61,7 +61,7 @@ After changing source code, rebuild and select **Reload** on the TabSpace extens
 
 ### Spaces and groups
 
-New tabs enter the most recently active space as Ungrouped. The sidebar lists every currently open tab in the dashboard's Chrome window, regardless of which TabSpace space or group owns it. Drag an open sidebar tab onto a group, or onto **New group** to create a default group automatically. Tab cards can also be dragged between groups or back to Ungrouped. Use the space toolbar to create or switch spaces. Deleting a group moves its tabs to Ungrouped. Deleting a space keeps its Chrome tabs open and moves their records ungrouped to the first remaining space. The final space cannot be deleted.
+New tabs enter the most recently active space as Ungrouped. Groups are persistent bookmark collections: closing a Chrome tab removes it only from the sidebar and keeps its card, group, alias, and icon. Reopening the same URL reconnects the live tab to that existing card. The sidebar lists every currently open tab in the dashboard's Chrome window, regardless of which TabSpace space or group owns it. Drag an open sidebar tab onto a group, or onto **New group** to create a default group automatically. Tab cards can also be dragged between groups or back to Ungrouped. Use the space toolbar to create or switch spaces. Deleting a group moves its tabs to Ungrouped. Deleting a space keeps its Chrome tabs open and moves their records ungrouped to the first remaining space. The final space cannot be deleted.
 
 ### Search, layout, and tab actions
 

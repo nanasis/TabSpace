@@ -36,6 +36,14 @@ function isDashboardUrl(candidateUrl: string, dashboardUrl: string) {
   }
 }
 
+function canonicalUrl(url: string) {
+  try {
+    return new URL(url).href
+  } catch {
+    return url
+  }
+}
+
 function accessedAt(tab: BrowserTabSnapshot, fallback: string) {
   return tab.lastAccessed !== undefined && Number.isFinite(tab.lastAccessed)
     ? new Date(tab.lastAccessed).toISOString()
@@ -94,12 +102,28 @@ export function reconcileTabs(
       .filter((record): record is TabRecord & { chromeTabId: number } => record.chromeTabId !== undefined)
       .map((record) => [record.chromeTabId, record]),
   )
-  const retainedRecords = document.tabs.filter(
-    (record) => record.chromeTabId === undefined || liveTabIds.has(record.chromeTabId),
-  )
-  let changed = retainedRecords.length !== document.tabs.length
-  const nextRecords = [...retainedRecords]
+  let changed = false
+  const nextRecords = document.tabs.map((record) => {
+    if (record.chromeTabId === undefined || liveTabIds.has(record.chromeTabId)) return record
+    changed = true
+    return {
+      ...record,
+      chromeTabId: undefined,
+      windowId: undefined,
+      active: false,
+      pinned: false,
+      updatedAt: timestamp,
+    }
+  })
   const nextRecordIndexes = new Map(nextRecords.map((record, index) => [record.id, index]))
+  const savedRecordIndexesByUrl = new Map<string, number[]>()
+  nextRecords.forEach((record, index) => {
+    if (record.chromeTabId !== undefined) return
+    const url = canonicalUrl(record.url)
+    const indexes = savedRecordIndexesByUrl.get(url)
+    if (indexes) indexes.push(index)
+    else savedRecordIndexesByUrl.set(url, [index])
+  })
   let nextOrder =
     Math.max(
       -1,
@@ -124,7 +148,7 @@ export function reconcileTabs(
           windowId: tab.windowId,
           url: tab.url,
           title: tab.title,
-          ...(tab.faviconUrl ? { faviconUrl: tab.faviconUrl } : { faviconUrl: undefined }),
+          ...(tab.faviconUrl ? { faviconUrl: tab.faviconUrl } : {}),
           pinned: tab.pinned,
           active: tab.active,
           lastAccessedAt: tab.active ? nextAccessedAt : existing.lastAccessedAt,
@@ -133,6 +157,27 @@ export function reconcileTabs(
         changed = true
       }
       continue
+    }
+
+    const savedRecordIndex = savedRecordIndexesByUrl.get(canonicalUrl(tab.url))?.shift()
+    if (savedRecordIndex !== undefined) {
+      const savedRecord = nextRecords[savedRecordIndex]
+      if (savedRecord) {
+        nextRecords[savedRecordIndex] = {
+          ...savedRecord,
+          chromeTabId: tab.id,
+          windowId: tab.windowId,
+          url: tab.url,
+          title: tab.title,
+          ...(tab.faviconUrl ? { faviconUrl: tab.faviconUrl } : {}),
+          pinned: tab.pinned,
+          active: tab.active,
+          lastAccessedAt: nextAccessedAt,
+          updatedAt: timestamp,
+        }
+        changed = true
+        continue
+      }
     }
 
     const newRecord: TabRecord = {
