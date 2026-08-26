@@ -4,12 +4,16 @@ All notable changes to TabSpace are documented here.
 
 ## Unreleased
 
+## [0.1.2] - 2026-08-26
+
 ### Changed
 
 - Keep newly opened tabs sidebar-only until explicitly collected by the user
 - Hide the Ungrouped collection until it contains explicitly collected cards
 - Delete bookmark cards without closing live browser tabs or moving them to Ungrouped
 - Exclude sidebar-only runtime records from search, counts, backups, and exports
+- Allow closing active Chrome tabs directly from the current-window sidebar
+- Consolidate repeated active-space headers into one GroupSpace toolbar with spaces on the left and actions on the right
 
 ## [0.1.1] - 2026-08-26
 
@@ -48,5 +52,6 @@ All notable changes to TabSpace are documented here.
 - Sanitized imported URLs and favicon metadata
 - Unit, component, Chrome/GitHub boundary, production build, and Playwright coverage
 
+[0.1.2]: https://github.com/nanasis/TabSpace/releases/tag/v0.1.2
 [0.1.1]: https://github.com/nanasis/TabSpace/releases/tag/v0.1.1
 [0.1.0]: https://github.com/nanasis/TabSpace/releases/tag/v0.1.0

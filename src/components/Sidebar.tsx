@@ -1,8 +1,8 @@
-import { Globe2, Layers3, Pin, Rows3 } from 'lucide-react'
+import { Globe2, Layers3, Pin, Rows3, X } from 'lucide-react'
 import { memo, useMemo, useState } from 'react'
 
 import type { TabSpaceDocument } from '../model/document'
-import { activateBrowserTab } from '../tabs/chromeTabs'
+import { activateBrowserTab, closeBrowserTab } from '../tabs/chromeTabs'
 import { writeTabDragPayload } from '../tabs/tabDrag'
 
 export interface SidebarProps {
@@ -36,6 +36,15 @@ export const Sidebar = memo(function Sidebar({ document, currentWindowId, onActi
       await activateBrowserTab(tabId)
     } catch {
       onActionError('Chrome could not activate that tab. It may have been closed.')
+    }
+  }
+
+  async function close(tabId: number | undefined) {
+    if (tabId === undefined) return
+    try {
+      await closeBrowserTab(tabId)
+    } catch {
+      onActionError('Chrome could not close that tab. It may already be closed.')
     }
   }
 
@@ -85,31 +94,44 @@ export const Sidebar = memo(function Sidebar({ document, currentWindowId, onActi
         </div>
         <div className="mt-2 space-y-1">
           {visibleTabs.map((tab) => (
-            <button
+            <div
               key={tab.id}
-              className={`flex w-full cursor-grab items-center gap-2.5 rounded-lg px-2 py-2 text-left transition hover:bg-white/5 active:cursor-grabbing ${tab.active ? 'bg-violet-400/8 text-white' : 'text-zinc-400'}`}
-              onClick={() => void activate(tab.chromeTabId)}
+              className={`group flex w-full cursor-grab items-center gap-1 rounded-lg px-1 py-1 text-left transition hover:bg-white/5 active:cursor-grabbing ${tab.active ? 'bg-violet-400/8 text-white' : 'text-zinc-400'}`}
               onDragStart={(event) =>
                 writeTabDragPayload(event.dataTransfer, { tabId: tab.id, source: 'sidebar' })
               }
               draggable
               title="Drag to a group in the workspace"
-              type="button"
             >
-              <span className="grid size-7 shrink-0 place-items-center overflow-hidden rounded-lg bg-white/5 text-zinc-500">
-                {tab.avatarImage ? (
-                  <img className="size-full object-cover" src={tab.avatarImage} alt="" loading="lazy" decoding="async" />
-                ) : tab.avatarEmoji ? (
-                  <span className="text-sm">{tab.avatarEmoji}</span>
-                ) : tab.faviconUrl ? (
-                  <img className="size-4" src={tab.faviconUrl} alt="" loading="lazy" decoding="async" />
-                ) : (
-                  <Globe2 className="size-3.5" />
-                )}
-              </span>
-              <span className="min-w-0 flex-1 truncate text-xs">{tab.alias ?? tab.title}</span>
-              {tab.pinned ? <Pin className="size-3 shrink-0 text-violet-400" aria-label="Pinned" /> : null}
-            </button>
+              <button
+                className="flex min-w-0 flex-1 items-center gap-2.5 rounded-md px-1 py-1 text-left"
+                onClick={() => void activate(tab.chromeTabId)}
+                type="button"
+              >
+                <span className="grid size-7 shrink-0 place-items-center overflow-hidden rounded-lg bg-white/5 text-zinc-500">
+                  {tab.avatarImage ? (
+                    <img className="size-full object-cover" src={tab.avatarImage} alt="" loading="lazy" decoding="async" />
+                  ) : tab.avatarEmoji ? (
+                    <span className="text-sm">{tab.avatarEmoji}</span>
+                  ) : tab.faviconUrl ? (
+                    <img className="size-4" src={tab.faviconUrl} alt="" loading="lazy" decoding="async" />
+                  ) : (
+                    <Globe2 className="size-3.5" />
+                  )}
+                </span>
+                <span className="min-w-0 flex-1 truncate text-xs">{tab.alias ?? tab.title}</span>
+                {tab.pinned ? <Pin className="size-3 shrink-0 text-violet-400" aria-label="Pinned" /> : null}
+              </button>
+              <button
+                className="grid size-7 shrink-0 place-items-center rounded-md text-zinc-700 opacity-0 transition hover:bg-red-400/10 hover:text-red-300 group-hover:opacity-100 focus:opacity-100"
+                onClick={() => void close(tab.chromeTabId)}
+                aria-label={`Close ${tab.alias ?? tab.title}`}
+                title="Close this Chrome tab"
+                type="button"
+              >
+                <X className="size-3.5" />
+              </button>
+            </div>
           ))}
           {!visibleTabs.length ? (
             <div className="px-3 py-10 text-center text-xs leading-5 text-zinc-600">

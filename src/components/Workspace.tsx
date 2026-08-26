@@ -33,6 +33,7 @@ import { deleteTabCard, moveTab, moveTabs } from '../model/tabOperations'
 import { searchTabs } from '../tabs/searchTabs'
 import { readTabDragPayload } from '../tabs/tabDrag'
 import { NewGroupDialog } from './NewGroupDialog'
+import { SpaceBar } from './SpaceBar'
 import { TabCard } from './TabCard'
 
 interface MoveDestination {
@@ -213,53 +214,56 @@ export const Workspace = memo(function Workspace({
 
   return (
     <>
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-violet-400">Active workspace</p>
-          <h2 id="workspace-title" className="mt-2 text-2xl font-semibold tracking-tight">
-            {document.spaces.find(({ id }) => id === activeSpaceId)?.name ?? 'Your tabs'}
-          </h2>
-          <p className="mt-1 text-xs text-zinc-500">{activeTabs.length} tabs · {groups.length} groups</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <label className="relative block">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-zinc-600" />
-            <input
-              className="w-48 rounded-lg border border-white/10 bg-black/20 py-2 pl-8 pr-8 text-xs outline-none placeholder:text-zinc-700 focus:border-violet-400/40 sm:w-64"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search tabs…"
-              aria-label="Search tabs"
-            />
-            {query ? <button className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-white" onClick={() => setQuery('')} aria-label="Clear search" type="button"><X className="size-3.5" /></button> : null}
-          </label>
-          <div
-            className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs transition ${dropTarget === 'collect-ungrouped' ? 'border-violet-300 bg-violet-400/15 text-violet-100 ring-2 ring-violet-400/20' : 'border-dashed border-white/15 text-zinc-500'}`}
-            role="region"
-            aria-label="Collect tab as Ungrouped drop area"
-            onDragEnter={(event) => { event.preventDefault(); setDropTarget('collect-ungrouped') }}
-            onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = 'move' }}
-            onDragLeave={clearDropTarget}
-            onDrop={(event) => moveDroppedTab(event)}
-            title="Drag an open sidebar tab here to collect it without a group"
-          >
-            <Layers3 className="size-3.5" />
-            {dropTarget === 'collect-ungrouped' ? 'Drop to collect' : 'Collect ungrouped'}
-          </div>
-          <button
-            className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs font-medium transition ${dropTarget === 'new-group' ? 'border-violet-300 bg-violet-400 text-white ring-2 ring-violet-400/30' : 'border-violet-500 bg-violet-500 hover:bg-violet-400'}`}
-            onClick={() => setShowNewGroup(true)}
-            onDragEnter={(event) => { event.preventDefault(); setDropTarget('new-group') }}
-            onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = 'move' }}
-            onDragLeave={clearDropTarget}
-            onDrop={createGroupFromDrop}
-            title="Click to name a group, or drop a tab to create New Group"
-            type="button"
-          >
-            <Plus className="size-3.5" /> {dropTarget === 'new-group' ? 'Drop to create group' : 'New group'}
-          </button>
-        </div>
-      </div>
+      <SpaceBar
+        document={document}
+        updateDocument={updateDocument}
+        onError={onError}
+        rightActions={
+          <>
+            <label className="relative block">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-3.5 -translate-y-1/2 text-zinc-600" />
+              <input
+                className="w-40 rounded-lg border border-white/10 bg-black/20 py-2 pl-8 pr-8 text-xs outline-none placeholder:text-zinc-700 focus:border-violet-400/40 xl:w-56"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search tabs…"
+                aria-label="Search tabs"
+              />
+              {query ? <button className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-white" onClick={() => setQuery('')} aria-label="Clear search" type="button"><X className="size-3.5" /></button> : null}
+            </label>
+            <div
+              className={`flex items-center gap-2 rounded-lg border px-2.5 py-2 text-xs transition ${dropTarget === 'collect-ungrouped' ? 'border-violet-300 bg-violet-400/15 text-violet-100 ring-2 ring-violet-400/20' : 'border-dashed border-white/15 text-zinc-500'}`}
+              role="region"
+              aria-label="Collect tab as Ungrouped drop area"
+              onDragEnter={(event) => { event.preventDefault(); setDropTarget('collect-ungrouped') }}
+              onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = 'move' }}
+              onDragLeave={clearDropTarget}
+              onDrop={(event) => moveDroppedTab(event)}
+              title="Drag an open sidebar tab here to collect it without a group"
+            >
+              <Layers3 className="size-3.5" />
+              <span className="hidden 2xl:inline">
+                {dropTarget === 'collect-ungrouped' ? 'Drop to collect' : 'Collect ungrouped'}
+              </span>
+            </div>
+            <button
+              className={`flex items-center gap-2 rounded-lg border px-2.5 py-2 text-xs font-medium transition ${dropTarget === 'new-group' ? 'border-violet-300 bg-violet-400 text-white ring-2 ring-violet-400/30' : 'border-violet-500 bg-violet-500 hover:bg-violet-400'}`}
+              onClick={() => setShowNewGroup(true)}
+              onDragEnter={(event) => { event.preventDefault(); setDropTarget('new-group') }}
+              onDragOver={(event) => { event.preventDefault(); event.dataTransfer.dropEffect = 'move' }}
+              onDragLeave={clearDropTarget}
+              onDrop={createGroupFromDrop}
+              title="Click to name a group, or drop a tab to create New Group"
+              type="button"
+            >
+              <Plus className="size-3.5" />
+              <span className="hidden xl:inline">
+                {dropTarget === 'new-group' ? 'Drop to create group' : 'New group'}
+              </span>
+            </button>
+          </>
+        }
+      />
 
       {selectedIds.size ? (
         <div className="mt-5 flex flex-wrap items-center gap-3 rounded-xl border border-violet-400/20 bg-violet-400/8 px-3 py-2.5">

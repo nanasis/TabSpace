@@ -8,7 +8,6 @@ import {
 } from './components/ImportExportDialog'
 import { SettingsDialog } from './components/SettingsDialog'
 import { Sidebar } from './components/Sidebar'
-import { SpaceBar } from './components/SpaceBar'
 import { Workspace } from './components/Workspace'
 import { updateSettings } from './model/settingsOperations'
 import {
@@ -32,7 +31,6 @@ export function App({ repository }: AppProps) {
   const [transferView, setTransferView] = useState<DataTransferView>()
   const [currentWindowId, setCurrentWindowId] = useState<number>()
   const activeSpaceId = document?.settings.activeSpaceId
-  const activeSpace = document?.spaces.find(({ id }) => id === activeSpaceId)
 
   useEffect(() => {
     if (typeof chrome === 'undefined' || !chrome.windows?.getCurrent) return
@@ -54,9 +52,7 @@ export function App({ repository }: AppProps) {
       <div className="flex min-h-screen min-w-0 flex-1 flex-col lg:pl-72">
         <header className="sticky top-0 z-10 flex h-18 items-center gap-3 border-b border-white/8 bg-[#0b0b0f]/90 px-4 backdrop-blur-xl sm:px-7">
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium">
-              {activeSpace ? `${activeSpace.emoji} ${activeSpace.name}` : 'TabSpace'}
-            </p>
+            <p className="truncate text-sm font-medium">TabSpace</p>
             <p className="text-xs text-zinc-500">
               {loading
                 ? 'Loading tabs…'
@@ -74,15 +70,7 @@ export function App({ repository }: AppProps) {
           </button>
         </header>
 
-        {document ? (
-          <SpaceBar
-            document={document}
-            updateDocument={updateDocument}
-            onError={setActionError}
-          />
-        ) : null}
-
-        <main className="flex-1 p-4 sm:p-7" aria-labelledby="workspace-title">
+        <main className="flex-1 p-4 sm:p-7" aria-label="GroupSpace">
           <div
             className={
               document?.settings.cardDensity === 'dense' ? 'w-full max-w-none' : 'mx-auto max-w-7xl'

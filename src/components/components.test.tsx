@@ -68,6 +68,11 @@ describe('workspace components', () => {
 
     expect(screen.getByText('Open tab')).toBeInTheDocument()
     expect(screen.getByText('Other space tab')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Close Open tab' })).toHaveAttribute(
+      'title',
+      'Close this Chrome tab',
+    )
+    expect(screen.getByRole('button', { name: 'Close Other space tab' })).toBeInTheDocument()
     expect(screen.queryByText('Other window tab')).not.toBeInTheDocument()
     expect(screen.queryByText('Saved tab')).not.toBeInTheDocument()
   })

@@ -23,14 +23,14 @@ describe('App', () => {
     render(<App repository={createRepository()} />)
 
     expect(screen.getByRole('heading', { name: 'TabSpace' })).toBeInTheDocument()
-    expect(await screen.findByRole('heading', { name: 'My Space' })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /My Space/ })).toBeInTheDocument()
   })
 
   it('opens settings and persists card density', async () => {
     const user = userEvent.setup()
     const repository = createRepository()
     render(<App repository={repository} />)
-    await screen.findByRole('heading', { name: 'My Space' })
+    await screen.findByRole('button', { name: /My Space/ })
 
     await user.click(screen.getByRole('button', { name: 'Settings' }))
     expect(screen.getByRole('dialog', { name: 'Settings' })).toBeInTheDocument()

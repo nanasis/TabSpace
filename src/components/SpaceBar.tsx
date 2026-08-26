@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react'
-import { memo, useMemo } from 'react'
+import { memo, useMemo, type ReactNode } from 'react'
 
 import type { TabSpaceDocument } from '../model/document'
 import {
@@ -14,9 +14,15 @@ export interface SpaceBarProps {
   document: TabSpaceDocument
   updateDocument(transform: (document: TabSpaceDocument) => TabSpaceDocument): Promise<void>
   onError(message: string): void
+  rightActions?: ReactNode
 }
 
-export const SpaceBar = memo(function SpaceBar({ document, updateDocument, onError }: SpaceBarProps) {
+export const SpaceBar = memo(function SpaceBar({
+  document,
+  updateDocument,
+  onError,
+  rightActions,
+}: SpaceBarProps) {
   const activeSpace = document.spaces.find(({ id }) => id === document.settings.activeSpaceId)
   const countsBySpace = useMemo(() => {
     const counts = new Map<string, { tabs: number; groups: number }>()
@@ -48,10 +54,13 @@ export const SpaceBar = memo(function SpaceBar({ document, updateDocument, onErr
     if (!name) return
     const emoji = window.prompt('Space emoji:', activeSpace.emoji)?.trim() || activeSpace.emoji
     const requestedColor = window.prompt('Space color (hex):', activeSpace.color)?.trim()
-    const color = requestedColor && /^#[0-9a-f]{6}$/i.test(requestedColor) ? requestedColor : activeSpace.color
-    void updateDocument((current) => updateSpace(current, activeSpace.id, { name, emoji, color })).catch(() =>
-      onError('TabSpace could not rename that space.'),
-    )
+    const color =
+      requestedColor && /^#[0-9a-f]{6}$/i.test(requestedColor)
+        ? requestedColor
+        : activeSpace.color
+    void updateDocument((current) =>
+      updateSpace(current, activeSpace.id, { name, emoji, color }),
+    ).catch(() => onError('TabSpace could not rename that space.'))
   }
 
   function removeSpace() {
@@ -70,8 +79,8 @@ export const SpaceBar = memo(function SpaceBar({ document, updateDocument, onErr
   }
 
   return (
-    <div className="border-b border-white/8 bg-[#0d0d12] px-4 py-2.5 sm:px-7">
-      <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto">
+    <div className="mb-5 flex min-w-0 items-center gap-2 rounded-xl border border-white/8 bg-[#0d0d12] p-2">
+      <nav className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto" aria-label="Spaces">
         {[...document.spaces]
           .sort((left, right) => left.order - right.order)
           .map((space) => (
@@ -96,17 +105,21 @@ export const SpaceBar = memo(function SpaceBar({ document, updateDocument, onErr
         >
           <Plus className="size-3.5" />
         </button>
-        <span className="flex-1" />
-        <button className="icon-button" onClick={() => activeSpace && void updateDocument((current) => moveSpace(current, activeSpace.id, -1))} aria-label="Move space left" type="button">
+      </nav>
+
+      <div className="flex shrink-0 items-center gap-1.5">
+        {rightActions}
+        <span className="mx-1 h-5 w-px bg-white/8" aria-hidden="true" />
+        <button className="icon-button" onClick={() => activeSpace && void updateDocument((current) => moveSpace(current, activeSpace.id, -1))} aria-label="Move space left" title="Move active space left" type="button">
           <ChevronLeft className="size-3.5" />
         </button>
-        <button className="icon-button" onClick={() => activeSpace && void updateDocument((current) => moveSpace(current, activeSpace.id, 1))} aria-label="Move space right" type="button">
+        <button className="icon-button" onClick={() => activeSpace && void updateDocument((current) => moveSpace(current, activeSpace.id, 1))} aria-label="Move space right" title="Move active space right" type="button">
           <ChevronRight className="size-3.5" />
         </button>
-        <button className="icon-button" onClick={renameSpace} aria-label="Rename space" type="button">
+        <button className="icon-button" onClick={renameSpace} aria-label="Rename space" title="Edit active space" type="button">
           <Pencil className="size-3.5" />
         </button>
-        <button className="icon-button hover:text-red-300" onClick={removeSpace} aria-label="Delete space" type="button">
+        <button className="icon-button hover:text-red-300" onClick={removeSpace} aria-label="Delete space" title="Delete active space" type="button">
           <Trash2 className="size-3.5" />
         </button>
       </div>

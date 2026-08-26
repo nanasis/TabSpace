@@ -22,7 +22,7 @@ TabSpace is a privacy-conscious Chrome extension for organizing open and saved t
 ## Install the GitHub release
 
 1. Open the [latest GitHub release](https://github.com/nanasis/TabSpace/releases/latest).
-2. Download `tabspace-v0.1.1.zip` from **Assets**.
+2. Download `tabspace-v0.1.2.zip` from **Assets**.
 3. Extract the ZIP to a permanent folder. The selected folder must directly contain `manifest.json`.
 4. Open `chrome://extensions` in Chrome.
 5. Enable **Developer mode**.
@@ -31,16 +31,16 @@ TabSpace is a privacy-conscious Chrome extension for organizing open and saved t
 
 Chrome does not automatically update unpacked extensions. For a future release, download and extract the new ZIP over the existing folder, then select **Reload** on the TabSpace card in `chrome://extensions`.
 
-The release also provides `tabspace-v0.1.1.zip.sha256`. Verify it with:
+The release also provides `tabspace-v0.1.2.zip.sha256`. Verify it with:
 
 ```powershell
-Get-FileHash .\tabspace-v0.1.1.zip -Algorithm SHA256
+Get-FileHash .\tabspace-v0.1.2.zip -Algorithm SHA256
 ```
 
 or:
 
 ```bash
-sha256sum tabspace-v0.1.1.zip
+sha256sum tabspace-v0.1.2.zip
 ```
 
 Compare the output with the checksum file before loading the extension.
@@ -73,7 +73,7 @@ Available commands:
 | `npm test` | Run Vitest unit and component tests |
 | `npm run test:e2e` | Run the production-dashboard Playwright workflow |
 | `npm run build` | Build and verify the unpacked extension in `dist/` |
-| `npm run package` | Build and create `release/tabspace-v0.1.1.zip` |
+| `npm run package` | Build and create `release/tabspace-v0.1.2.zip` |
 | `npm run validate` | Run lint, types, tests, build verification, and E2E |
 
 ## Install a source build locally in Chrome
@@ -91,13 +91,13 @@ After changing source code, rebuild and select **Reload** on the TabSpace extens
 
 ### Spaces and groups
 
-Newly opened tabs appear in the sidebar only; they are not added to GroupSpace automatically. Groups and Ungrouped are persistent bookmark collections created by explicit user actions. Drag an open sidebar tab onto a group, onto **New group** to create a default group, or onto the top **Collect ungrouped** target to create an Ungrouped card. The Ungrouped section is hidden until it contains collected cards. Closing a Chrome tab removes it only from the sidebar and keeps any collected card, group, alias, and icon. Reopening the same URL reconnects the live tab to that existing card. The sidebar lists every currently open tab in the dashboard's Chrome window, regardless of which TabSpace space or group owns it. Tab cards can also be dragged between groups or to the Ungrouped target. Use the space toolbar to create or switch spaces. Deleting a group moves its tabs to Ungrouped. Deleting a space keeps its Chrome tabs open and moves their records ungrouped to the first remaining space. The final space cannot be deleted.
+Newly opened tabs appear in the sidebar only; they are not added to GroupSpace automatically. Groups and Ungrouped are persistent bookmark collections created by explicit user actions. Drag an open sidebar tab onto a group, onto **New group** to create a default group, or onto the top **Collect ungrouped** target to create an Ungrouped card. The Ungrouped section is hidden until it contains collected cards. Closing a Chrome tab removes it only from the sidebar and keeps any collected card, group, alias, and icon. Reopening the same URL reconnects the live tab to that existing card. The sidebar lists every currently open tab in the dashboard's Chrome window, regardless of which TabSpace space or group owns it. Use the row X to close a live Chrome tab without changing any collected bookmark card. Tab cards can also be dragged between groups or to the Ungrouped target. Use the space toolbar to create or switch spaces. Deleting a group moves its tabs to Ungrouped. Deleting a space keeps its Chrome tabs open and moves their records ungrouped to the first remaining space. The final space cannot be deleted.
 
 ### Search, layout, and tab actions
 
 Search matches aliases, titles, domains, and URLs. Select a card title to activate/open the tab. **Edit** opens a dashboard-styled editor for the alias and card icon: keep the default site icon, choose an emoji, or upload a local image up to 192 KB. Custom images remain in local storage and TabSpace backups. The card footer provides Edit and Pin actions with hover descriptions. The top X deletes the bookmark card instead of moving it to Ungrouped and never closes an associated browser tab; an open tab remains available in the sidebar and can be collected again later. Change the avatar from its icon, drag cards between groups, or use Ctrl/Cmd/Shift selection for bulk movement.
 
-Under **Settings → Tab card density**, choose **Dense** to use the full GroupSpace width and dynamically fit more cards per row while preserving Compact card width, padding, and gaps. Choose **Compact** to retain the original bounded responsive layout. Existing `comfortable` settings are migrated to Compact automatically.
+GroupSpace uses one consolidated toolbar: spaces remain aligned on the left, while search, collection/group actions, and active-space controls are aligned on the right. Under **Settings → Tab card density**, choose **Dense** to use the full GroupSpace width and dynamically fit more cards per row while preserving Compact card width, padding, and gaps. Choose **Compact** to retain the original bounded responsive layout. Existing `comfortable` settings are migrated to Compact automatically.
 
 ### Import and export
 
