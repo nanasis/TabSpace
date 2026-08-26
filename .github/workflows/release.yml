@@ -27,7 +27,7 @@ jobs:
       - run: npm run build:site
       - run: node scripts/package-extension.mjs
       - name: Create checksum
-        run: sha256sum release/tabspace-v0.1.0.zip > release/tabspace-v0.1.0.zip.sha256
+        run: cd release && sha256sum tabspace-v0.1.0.zip > tabspace-v0.1.0.zip.sha256
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:

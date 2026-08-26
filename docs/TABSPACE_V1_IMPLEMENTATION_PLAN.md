@@ -369,7 +369,7 @@ A work item is not complete until all seven steps pass. Material design differen
 
 - `npm run validate` passes ESLint, TypeScript, 61 Vitest tests, extension and website builds, manifest reference verification, and Playwright E2E.
 - Component tests cover open-only sidebar rendering, sidebar-to-group dragging, and group-to-group card dragging. Domain tests cover default-group creation, collision-safe naming, and atomic tab movement.
-- Release validation runs clean install, lint, type-check, tests, extension/site builds, packaging, checksum generation, and GitHub Release publication for tag `v0.1.0`.
+- Release validation runs clean install, lint, type-check, tests, extension/site builds, packaging, checksum generation, and GitHub Release publication for tag `v0.1.0`. The published release page and both assets returned HTTP 200; the downloaded ZIP matched its SHA-256 value and passed full archive/manifest verification. GitHub Pages was also verified with the new release installation content.
 - Reconciliation tests verify that closing a grouped live tab preserves its bookmark/group and that reopening the URL reuses the same record instead of creating a duplicate.
 - Settings and component tests verify separate Import/Export actions, the tab-card Edit dialog and uploaded icon persistence, simplified card actions and group removal, Dense persistence, full-width workspace rendering, equal Compact/Dense card spacing, dynamic auto-fill columns, legacy Comfortable normalization, Compact compatibility, and single-pass bulk moves.
 - GitHub boundary tests cover successful history-version updates, remote conflicts, and legacy ETag compatibility without sending unsupported conditional PATCH headers.
